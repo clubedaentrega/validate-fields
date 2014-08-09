@@ -123,9 +123,6 @@ module.exports.registerType = function (definition, jsonType, checkFn) {
 		simpleTypes[definition] = type
 	} else if (definition instanceof RegExp) {
 		// Defined by a RegExp: create a callback
-		if (jsonType !== 'string') {
-			throw new Error('When defining a type with a RegExp, the jsonType must be string')
-		}
 		callbackTypes.fns.push(function (def2) {
 			var match
 			if (typeof def2 === 'string' && (match = def2.match(definition))) {

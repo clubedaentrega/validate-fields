@@ -34,6 +34,7 @@ See the list of valid values for the schema bellow
 var schema = validate.parse([String]) // a non-empty array of non-empty strings
 
 // Set express route
+// app here is an express instance, used only to ilustrate this example (not part of this module!)
 app.post('/api/posts/by-tags', function (req, res, next) {
 	// Validate using the parsed schema
 	if (schema.validate(req.body)) {
@@ -44,19 +45,19 @@ app.post('/api/posts/by-tags', function (req, res, next) {
 	}
 }, handlePostsByTags)
 ```
-This way is recommended not only for speed, but mainly because if the schema definition is invalid, `validate.parse()` will throw early. Another advantage is that `schame.validate()` doesn't throw.
+This way is recommended because if the schema definition is invalid, `validate.parse()` will throw early and `schema.validate()` won't throw. You also gain in speed!
 
 ## Standard types
 
 ### Hash map (object)
-Example: `{a: Number, 'b?': String, c: {d: 'int'}}
+Example: `{a: Number, 'b?': String, c: {d: 'int'}}`
 
-Keys that end in `'?'` are optional (`b`, in the example above). All others must be present and not empty (that is, not `''` or `null` or `undefined` or `[]`).
+Keys that end in `'?'` are optional (`b`, in the example above). All others must be present and must not empty (that is, neither `''` nor `null` nor `undefined` nor `[]`).
 
 If a value is optional and is empty it will be removed. Example:
 ```javascript
-var obj = {a: ''}
-validate({'a?': String}, obj) // true
+var obj = {a: '', b: null}
+validate({'a?': String, 'b?': 'int'}, obj) // true
 obj // {}
 ```
 
@@ -68,8 +69,8 @@ Example: `{books: [{title: String, author: String}]}`
 * `String`: a non-empty string
 * `Object`: any non-null object
 * `Array`: any non-empty array
-* `Boolean
-* `Date`: any date string accepted by Date constructor (ISO string is better though)
+* `Boolean`
+* `Date`: any date string accepted by Date constructor (ISO strings are better though)
 * `'int'`: a integer between -2^51 and 2^51 (safe integer)
 * `'uint'`: a natural number less than 2^51
 * `'string(17)'`: a string with exactly 17 chars
@@ -79,8 +80,8 @@ Example: `{books: [{title: String, author: String}]}`
 * `'hex'`: a non-empty hex string
 * `'hex(12)'`: a hex-string with exactly 12 hex-chars (that is, 6 bytes)
 * `'id'`: a mongo objectId as a 24-hex-char string
-* `'email'`: a string that seems like an email
-* `'in(red, green, blue)'`: a string within the given set of strings
+* `'email'`: a string that looks like an email
+* `'in(red, green, blue)'`: a string in the given set of strings
 * `/my-own-regex/`: a string that matches the custom regexp
 
 ## Custom types
@@ -116,10 +117,10 @@ validate({n: 'divBy3'}, obj) // true
 obj.n // 4
 ```
 
-In the example bellow, we implement the general case of the above. Instead of a fixed string (divBy3) we define a regex that matches 'divBy' followed by a number. The result of the match go into the extra array (sent as third parameter to the check function).
+In the example bellow, we implement the general case of the above. Instead of a fixed string (divBy3) we define a regex that matches 'divBy' followed by a number. The result of the match goes into the extra array (sent as third parameter to the check function).
 ```javascript
 validate.registerType(/^divBy(\d+)$/, 'number', function (value, path, extra) {
-	var n = Number(extra[1]) // see String.prototype.match
+	var n = Number(extra[1]) // extra is value returned by String.prototype.match
 	if (value%n !== 0) {
 		throw new Error('I was expecting a number divisible by '+n+' in '+path)
 	}
@@ -128,4 +129,4 @@ validate.registerType(/^divBy(\d+)$/, 'number', function (value, path, extra) {
 validate('divBy17', 35) // false
 validate('divBy35', 35) // true
 ```
-See more examples in `types.js`
+See more examples in the file `types.js`
