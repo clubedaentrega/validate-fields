@@ -6,6 +6,9 @@ var Field = require('./Field.js'),
 /** Store types defined by a string */
 var simpleTypes = Object.create(null)
 
+/** Store types defined in terms of other ones */
+var typedefs = Object.create(null)
+
 /** Store types defined by an object */
 var objectTypes = {
 	objects: [],
@@ -19,6 +22,26 @@ var callbackTypes = {
 }
 
 /**
+ * Validate the given value against the given schema
+ * @param {*} schema
+ * @param {*} value The value can be altered by the validation
+ * @returns {boolean} whether the value is valid or nor
+ * @throw if the schema is invalid
+ */
+module.exports = function (schema, value) {
+	schema = module.exports.parse(schema)
+	var ret = schema.validate(value)
+	module.exports.lastError = schema.lastError
+	return ret
+}
+
+/**
+ * Store the last error message
+ * @property {string}
+ */
+module.exports.lastError = ''
+
+/**
  * Parse the given fields definition
  * @param {Object} fields
  * @returns {Field} The parsed object that can be used with validate()
@@ -30,6 +53,9 @@ module.exports.parse = function (fields) {
 	if (typeof fields === 'string' && fields in simpleTypes) {
 		// Type defined by a string
 		return new Field(simpleTypes[fields])
+	} else if (typeof fields === 'string' && fields in typedefs) {
+		// Type defined by a string
+		return typedefs[fields]
 	} else if ((pos = objectTypes.objects.indexOf(fields)) !== -1) {
 		// Type defined by an object
 		return new Field(objectTypes.types[pos])
@@ -45,6 +71,23 @@ module.exports.parse = function (fields) {
 		// Nothing found
 		throw new Error('I couldn\'t understand field definition: ' + fields)
 	}
+}
+
+/**
+ * Define a new simple type based on existing types
+ * @param {string} name
+ * @param {*} definition
+ * @throws if definition could not be understood or this type already exists
+ */
+module.exports.typedef = function (name, definition) {
+	if (typeof name !== 'string') {
+		throw new Error('Invalid argument type for name, it must be a string')
+	}
+	definition = module.exports.parse(definition)
+	if (name in simpleTypes || name in typedefs) {
+		throw new Error('Type ' + name + ' already registered')
+	}
+	typedefs[name] = definition
 }
 
 /**
@@ -74,7 +117,7 @@ module.exports.registerType = function (definition, jsonType, checkFn) {
 	var type = new Type(jsonType, checkFn || function () {})
 	if (typeof definition === 'string') {
 		// Simple definition: match a single string
-		if (definition in simpleTypes) {
+		if (definition in simpleTypes || definition in typedefs) {
 			throw new Error('Type ' + definition + ' already registered')
 		}
 		simpleTypes[definition] = type

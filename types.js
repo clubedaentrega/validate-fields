@@ -63,7 +63,7 @@ register(function (definition, parse) {
 		} else if (isEmpty(value[key])) {
 			throw new Error('I was expecting a non-empty value in ' + subpath)
 		}
-		value[key] = field.validate(value[key], subpath)
+		value[key] = field._validate(value[key], subpath)
 	}
 
 	// Check optional fields
@@ -74,7 +74,7 @@ register(function (definition, parse) {
 			if (isEmpty(value[key])) {
 				delete value[key]
 			} else {
-				value[key] = field.validate(value[key], subpath)
+				value[key] = field._validate(value[key], subpath)
 			}
 		}
 	}
@@ -101,7 +101,7 @@ register(function (definition, parse) {
 	}
 	for (i = 0; i < value.length; i++) {
 		subpath = path ? path + '.' + i : i
-		value[i] = extra.validate(value[i], subpath)
+		value[i] = extra._validate(value[i], subpath)
 	}
 	return value
 })

@@ -20,36 +20,36 @@ describe('basic types', function () {
 		fields.validate({
 			aNumber: 17,
 			aString: 'hi'
-		})
+		}).should.be.true
 
 		fields.validate({
 			aNumber: -2,
 			aString: 'Hello',
 			optional: true
-		})
+		}).should.be.true
 	})
 
 	it('should escape HTML', function () {
-		fields.validate({
+		var obj = {
 			aNumber: 0,
 			aString: 'escape <html>'
-		}).aString.should.be.equal('escape &lt;html&gt;')
+		}
+		fields.validate(obj).should.be.true
+		obj.aString.should.be.equal('escape &lt;html&gt;')
 	})
 
 	it('should not accept a missing key', function () {
-		(function () {
-			fields.validate({
-				aNumber: 0
-			})
-		}).should.throw('I was expecting a value in aString')
+		fields.validate({
+			aNumber: 0
+		}).should.be.false
+		fields.lastError.should.be.equal('I was expecting a value in aString')
 	})
 
 	it('should not accept an empty string', function () {
-		(function () {
-			fields.validate({
-				aNumber: 0,
-				aString: ''
-			})
-		}).should.throw('I was expecting a non-empty value in aString')
+		fields.validate({
+			aNumber: 0,
+			aString: ''
+		}).should.be.false
+		fields.lastError.should.be.equal('I was expecting a non-empty value in aString')
 	})
 })
