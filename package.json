@@ -1,0 +1,29 @@
+{
+	"name": "validate-fields",
+	"version": "0.0.1",
+	"author": "Sitegui <sitegui@sitegui.com.br>",
+	"description": "A simple yet powerful JSON schema validator",
+	"main": "./index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sitegui/validate-fields"
+	},
+	"keywords": [
+		"json",
+		"express",
+		"validator",
+		"fields"
+	],
+	"dependencies": {},
+	"license": "MIT",
+	"engines": {
+		"node": ">=0.10"
+	},
+	"scripts": {
+		"test": "mocha test"
+	},
+	"devDependencies": {
+		"mocha": "^1.21.4",
+		"should": "^4.0.4"
+	}
+}
