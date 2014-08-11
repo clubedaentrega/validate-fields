@@ -80,8 +80,8 @@ Example: `{books: [{title: String, author: String}]}`
 * `'hex'`: a non-empty hex string
 * `'hex(12)'`: a hex-string with exactly 12 hex-chars (that is, 6 bytes)
 * `'id'`: a mongo objectId as a 24-hex-char string
-* `'email'`: a string that looks like an email
-* `'in(red, green, blue)'`: a string in the given set of strings
+* `'email'`: a string that looks like an email address
+* `'in(cat, dog, cow)'`: a string in the given set of strings
 * `/my-own-regex/`: a string that matches the custom regexp
 
 ## Custom types

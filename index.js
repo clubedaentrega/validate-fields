@@ -92,25 +92,24 @@ module.exports.typedef = function (name, definition) {
 
 /**
  * @callback parseCallback
- * @param {*} definition
- * @param {function} parse
- * @returns {*}
- * @throws
+ * @param {*} definition the value being parsed
+ * @param {function} parse the root parse function, used to create recursive definitions
+ * @returns {*} undefined if the definition could not be parsed or a value (any other) to indicate the definition was parsed. The returned value will be sent to checkCallback afterwards
  */
 
 /**
  * @callback checkCallback
- * @param {*} value
- * @param {string} path
- * @param {*} extra
- * @returns {boolean}
- * @throws
+ * @param {*} value the value to check
+ * @param {string} path a string used in the error message
+ * @param {*} extra the result of String.prototype.match if the type is defined with a regexp or the parseCallback result if defined with a function
+ * @returns {*} optionally return the altered value
+ * @throws if the value is invalid, the message will be put in the lastError property of the validation schema
  */
 
 /**
  * Register a new type
  * @param {(string|Object|RegExp|parseCallback)} definition
- * @param {string} jsType
+ * @param {string} jsonType One of 'number', 'string', 'boolean', 'object' or 'array'
  * @param {checkCallback} [checkFn=function(){}]
  */
 module.exports.registerType = function (definition, jsonType, checkFn) {
