@@ -151,5 +151,22 @@ module.exports.registerType = function (definition, jsonType, checkFn) {
 	}
 }
 
+/**
+ * Return a reference to all registered types
+ * You can change it to alter the very inner working of this module
+ * The two main types are:
+ * * Hash map: callbackTypes.fns[0], callbackTypes.types[0]
+ * * Array: callbackTypes.fns[1], callbackTypes.types[1]
+ * @returns {{simpleTypes: Object.<string, Type>, typedefs: Field, objectTypes: {objects: Object[], types: Type[]}, callbackTypes: {fns: Function[], types: Type[]}}}
+ */
+module.exports.getRegisteredTypes = function () {
+	return {
+		simpleTypes: simpleTypes,
+		typedefs: typedefs,
+		objectTypes: objectTypes,
+		callbackTypes: callbackTypes
+	}
+}
+
 // Register standard types
 require('./types.js')
