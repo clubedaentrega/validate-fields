@@ -24,6 +24,22 @@ describe('readme examples', function () {
 		schema.validate(['a', 'b']).should.be.true
 	})
 
+	it('should work for escaping example', function () {
+		var v = ['<html>']
+		validate([String], v)
+		v[0].should.be.equal('<html>')
+		validate([String], v, {
+			escape: true
+		})
+		v[0].should.be.equal('&lt;html&gt;')
+
+		v = ['<html>']
+		validate.parse([String]).validate(v, {
+			escape: true
+		})
+		v[0].should.be.equal('&lt;html&gt;')
+	})
+
 	it('should work for the hash map example', function () {
 		var obj = {
 			a: '',

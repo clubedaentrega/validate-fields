@@ -25,12 +25,13 @@ var callbackTypes = {
  * Validate the given value against the given schema
  * @param {*} schema
  * @param {*} value The value can be altered by the validation
+ * @param {Object} [options] Validation options
  * @returns {boolean} whether the value is valid or nor
  * @throw if the schema is invalid
  */
-module.exports = function (schema, value) {
+module.exports = function (schema, value, options) {
 	schema = module.exports.parse(schema)
-	var ret = schema.validate(value)
+	var ret = schema.validate(value, options)
 	module.exports.lastError = schema.lastError
 	return ret
 }
@@ -102,6 +103,7 @@ module.exports.typedef = function (name, definition) {
  * @param {*} value the value to check
  * @param {string} path a string used in the error message
  * @param {*} extra the result of String.prototype.match if the type is defined with a regexp or the parseCallback result if defined with a function
+ * @param {Object} options
  * @returns {*} optionally return the altered value
  * @throws if the value is invalid, the message will be put in the lastError property of the validation schema
  */

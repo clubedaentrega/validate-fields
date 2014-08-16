@@ -51,7 +51,7 @@ register(function (definition, parse) {
 	})
 
 	return extra
-}, 'object', function (value, path, extra) {
+}, 'object', function (value, path, extra, options) {
 	var key, field, subpath
 
 	// Check required fields
@@ -63,7 +63,7 @@ register(function (definition, parse) {
 		} else if (isEmpty(value[key])) {
 			throw new Error('I was expecting a non-empty value in ' + subpath)
 		}
-		value[key] = field._validate(value[key], subpath)
+		value[key] = field._validate(value[key], subpath, options)
 	}
 
 	// Check optional fields
@@ -74,7 +74,7 @@ register(function (definition, parse) {
 			if (isEmpty(value[key])) {
 				delete value[key]
 			} else {
-				value[key] = field._validate(value[key], subpath)
+				value[key] = field._validate(value[key], subpath, options)
 			}
 		}
 	}
@@ -94,14 +94,14 @@ register(function (definition, parse) {
 	}
 
 	return parse(definition[0])
-}, 'array', function (value, path, extra) {
+}, 'array', function (value, path, extra, options) {
 	var i, subpath
 	if (value.length === 0) {
 		throw new Error('I was expecting a non-empty array in ' + path)
 	}
 	for (i = 0; i < value.length; i++) {
 		subpath = path ? path + '.' + i : i
-		value[i] = extra._validate(value[i], subpath)
+		value[i] = extra._validate(value[i], subpath, options)
 	}
 	return value
 })
@@ -115,13 +115,13 @@ register(Number, 'number')
 /**
  * A non-empty string (unless in a hash map, marked as optional)
  * Example: {name: {first: String, 'last?': String}}
- * The string will be HTML escaped
+ * The string will be HTML escaped if options.escape is true
  */
-register(String, 'string', function (value, path) {
+register(String, 'string', function (value, path, _, options) {
 	if (value.length === 0) {
 		throw new Error('I was expecting a non-empty string in ' + path)
 	}
-	return escape(value)
+	return options.escape ? escape(value) : value
 })
 
 /**
@@ -192,9 +192,12 @@ register('uint', 'number', function (value, path) {
  * 'string(,100)': at most 100 chars
  * 'string(8,)': at least 8 chars
  * 'string(8,100)': at most 100, at least 8
+ * The string will be HTML escaped if options.escape is true
  */
-register(/^string\((\d+)?,?(\d+)?\)$/, 'string', function (value, path, extra) {
-	value = escape(value)
+register(/^string\((\d+)?,?(\d+)?\)$/, 'string', function (value, path, extra, options) {
+	if (options.escape) {
+		value = escape(value)
+	}
 	if (value.length === 0) {
 		throw new Error('I was expecting a non-empty string in ' + path)
 	} else if (extra[1] && value.length < Number(extra[1])) {

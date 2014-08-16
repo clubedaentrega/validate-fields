@@ -35,10 +35,11 @@ Type.prototype.checkFn
  * @param {*} value
  * @param {string} path
  * @param {*} extra
+ * @param {Object} options
  * @returns {*} the validated value
  * @throws if invalid
  */
-Type.prototype.validate = function (value, path, extra) {
+Type.prototype.validate = function (value, path, extra, options) {
 	var type = typeof value,
 		ret
 	if (this.jsonType === 'array' && !Array.isArray(value)) {
@@ -46,7 +47,7 @@ Type.prototype.validate = function (value, path, extra) {
 	} else if (this.jsonType !== 'array' && this.jsonType !== type) {
 		throw new Error('I was expecting ' + this.jsonType + ' and you gave me ' + type + ' in ' + path)
 	}
-	ret = this.checkFn(value, path, extra)
+	ret = this.checkFn(value, path, extra, options)
 	return ret === undefined ? value : ret
 }
 

@@ -47,6 +47,27 @@ app.post('/api/posts/by-tags', function (req, res, next) {
 ```
 This way is recommended because if the schema definition is invalid, `validate.parse()` will throw early and `schema.validate()` won't throw. You also gain in speed!
 
+## Escaping HTML
+HTML strings can be escaped by sending one more argument to `validate`:
+```javascript
+var v = ['html>']
+validate([String], v)
+v[0] === 'html>'
+
+validate([String], v, {
+	escape: true
+})
+v[0] === 'html&gt;'
+```
+Or, using pre-parsing
+```javascript
+var v = ['html>']
+validate.parse([String]).validate(v, {
+	escape: true
+})
+v[0] === 'html&gt;'
+```
+
 ## Standard types
 
 ### Hash map (object)

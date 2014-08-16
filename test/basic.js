@@ -29,12 +29,23 @@ describe('basic types', function () {
 		}).should.be.true
 	})
 
-	it('should escape HTML', function () {
+	it('should not escape HTML', function () {
 		var obj = {
 			aNumber: 0,
 			aString: 'escape <html>'
 		}
 		fields.validate(obj).should.be.true
+		obj.aString.should.be.equal('escape <html>')
+	})
+
+	it('should escape HTML when told to', function () {
+		var obj = {
+			aNumber: 0,
+			aString: 'escape <html>'
+		}
+		fields.validate(obj, {
+			escape: true
+		}).should.be.true
 		obj.aString.should.be.equal('escape &lt;html&gt;')
 	})
 
