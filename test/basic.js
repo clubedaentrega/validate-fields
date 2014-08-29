@@ -63,4 +63,12 @@ describe('basic types', function () {
 		}).should.be.false
 		fields.lastError.should.be.equal('I was expecting a non-empty value in aString')
 	})
+
+	it('should work for null-prototype maps', function () {
+		var map = Object.create(null)
+		map.a = String
+		validate(map, {
+			a: 'hi'
+		}).should.be.true
+	})
 })

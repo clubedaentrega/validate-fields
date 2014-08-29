@@ -1,6 +1,6 @@
 {
 	"name": "validate-fields",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"author": "Sitegui <sitegui@sitegui.com.br>",
 	"description": "A simple yet powerful JSON schema validator",
 	"main": "./index.js",

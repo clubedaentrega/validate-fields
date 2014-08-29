@@ -24,8 +24,10 @@ function escape(str) {
 register(function (definition, parse) {
 	var extra
 
-	if (typeof definition !== 'object' || !definition || definition.constructor !== Object) {
-		// Only match literal objects like {a: Number, ...}
+	if (typeof definition !== 'object' ||
+		!definition ||
+		(definition.constructor !== Object && Object.getPrototypeOf(definition) !== null)) {
+		// Only match literal objects like {a: Number, ...} and null-prototype objects
 		return
 	}
 
