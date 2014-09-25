@@ -159,7 +159,7 @@ var fields = validate.parse({name: String, age: 'uint', 'birth?': Date})
 JSON.stringify(fields) // '{"name":"$String","age":"uint","birth?":"$Date"}'
 ```
 
-Note that custom types can be serialized, they are replaced by their JSON-type:
+Note that custom types can't be serialized, they are replaced by their JSON-type:
 ```javascript
 var fields = validate.parse({myType: 'divBy7'}) // defined above
 JSON.stringify(fields) // '{"myType":"$Number"}'
