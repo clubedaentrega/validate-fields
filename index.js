@@ -109,13 +109,20 @@ module.exports.typedef = function (name, definition) {
  */
 
 /**
+ * @callback toJSONCallback
+ * @param {*} extra
+ * @returns {*}
+ */
+
+/**
  * Register a new type
  * @param {(string|Object|RegExp|parseCallback)} definition
  * @param {string} jsonType One of 'number', 'string', 'boolean', 'object' or 'array'
  * @param {checkCallback} [checkFn=function(){}]
+ * @param {toJSONCallback|string} [toJSON] - Used only by core types
  */
-module.exports.registerType = function (definition, jsonType, checkFn) {
-	var type = new Type(jsonType, checkFn || function () {})
+module.exports.registerType = function (definition, jsonType, checkFn, toJSON) {
+	var type = new Type(jsonType, checkFn || function () {}, toJSON)
 	if (typeof definition === 'string') {
 		// Simple definition: match a single string
 		if (definition in simpleTypes || definition in typedefs) {
@@ -168,6 +175,39 @@ module.exports.getRegisteredTypes = function () {
 		objectTypes: objectTypes,
 		callbackTypes: callbackTypes
 	}
+}
+
+var JSONMap = {
+	$Number: Number,
+	$String: String,
+	$Object: Object,
+	$Array: Array,
+	$Boolean: Boolean,
+	$Date: Date,
+}
+
+/**
+ * This function is given to be used with JSON.parse() as the 2nd parameter:
+ * parse(JSON.parse(JSON.stringify(aField), reviver)) would give the aField back
+ * @param {string} key
+ * @param {*} value
+ * @returns {*}
+ */
+module.exports.reviver = function (key, value) {
+	var match
+
+	if (typeof value === 'string' && value[0] === '$') {
+		// Special types
+
+		if (value.indexOf('$RegExp:') === 0) {
+			match = value.match(/^\$RegExp:(.*?):(.*)$/)
+			return new RegExp(match[2], match[1])
+		} else if (value in JSONMap) {
+			return JSONMap[value]
+		}
+	}
+
+	return value
 }
 
 // Register standard types

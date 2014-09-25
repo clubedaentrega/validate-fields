@@ -4,8 +4,9 @@
  * @class
  * @param {string} jsonType
  * @param {checkCallback} checkFn
+ * @param {toJSONCallback|string} [toJSON]
  */
-function Type(jsonType, checkFn) {
+function Type(jsonType, checkFn, toJSON) {
 	if (typeof jsonType !== 'string') {
 		throw new Error('jsType must be a string')
 	} else if (jsonType !== 'number' && jsonType !== 'string' && jsonType !== 'boolean' && jsonType !== 'object' && jsonType !== 'array') {
@@ -14,21 +15,17 @@ function Type(jsonType, checkFn) {
 		throw new Error('checkFn must be a function')
 	}
 
+	/** @member {string} */
 	this.jsonType = jsonType
+
+	/** @member {Function} */
 	this.checkFn = checkFn
+
+	/** @member {?(toJSONCallback|string)} */
+	this._toJSON = toJSON
 }
 
 module.exports = Type
-
-/**
- * @property {string} jsonType
- */
-Type.prototype.jsonType
-
-/**
- * @property {function} checkFn
- */
-Type.prototype.checkFn
 
 /**
  * Check if a given value has the right type
@@ -60,4 +57,35 @@ Type.isEmpty = function (value) {
 		value === undefined ||
 		value === null ||
 		(Array.isArray(value) && value.length === 0)
+}
+
+// Lazy loaded require('./index').parse
+var parse
+
+/**
+ * Function called when stringifying a Field instance
+ * Only core types can be precisely stringified
+ * Custom types are represented by their parent JSON-type
+ * @param {*} extra
+ * @returns {*}
+ */
+Type.prototype.convertToJSON = function (extra) {
+	if (this._toJSON) {
+		return typeof this._toJSON === 'function' ? this._toJSON(extra) : this._toJSON
+	}
+
+	// Lazy loading
+	parse = parse || require('./index').parse
+
+	// Aproximated convertion
+	var typesMap = {
+			number: Number,
+			string: String,
+			boolean: Boolean,
+			object: Object,
+			array: Array
+		},
+		type = parse(typesMap[this.jsonType])
+
+	return type.toJSON()
 }

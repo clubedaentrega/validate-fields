@@ -151,3 +151,25 @@ validate('divBy17', 35) // false
 validate('divBy35', 35) // true
 ```
 See more examples in the file `types.js`
+
+## Interchangeable format
+A parsed `Field` can be serialized to JSON with `JSON.stringify()`:
+```javascript
+var fields = validate.parse({name: String, age: 'uint', 'birth?': Date})
+JSON.stringify(fields) // '{"name":"$String","age":"uint","birth?":"$Date"}'
+```
+
+Note that custom types can be serialized, they are replaced by their JSON-type:
+```javascript
+var fields = validate.parse({myType: 'divBy7'}) // defined above
+JSON.stringify(fields) // '{"myType":"$Number"}'
+```
+
+To get back a `Field` instance, `JSON.parse()` should be used with a reviver and the result then parsed:
+```javascript
+var serializedFields = '{"name":"$String","age":"uint","birth?":"$Date"}'
+var definition = JSON.parse(serializedFields, validate.reviver) // {name: String, age: 'uint', 'birth?': Date}
+var fields = validate.parse(definition)
+
+fields.validate({name: 'John', age: 12}) // true
+```

@@ -6,26 +6,17 @@
  * @param {*} extra
  */
 function Field(type, extra) {
+	/** @member {Type} */
 	this.type = type
+
+	/** @member {*} */
 	this.extra = extra
+
+	/** @member {string} */
+	this.lastError = ''
 }
 
 module.exports = Field
-
-/**
- * @property {Type} type
- */
-Field.prototype.type
-
-/**
- * @property {*} extra
- */
-Field.prototype.extra
-
-/**
- * @property {string} lastError
- */
-Field.prototype.lastError
 
 /**
  * Check if the value is follows the fields schema
@@ -55,4 +46,14 @@ Field.prototype.validate = function (value, options) {
  */
 Field.prototype._validate = function (value, path, options) {
 	return this.type.validate(value, path, this.extra, options)
+}
+
+/**
+ * Function called by JSON.stringify() applied to a Field instance
+ * Only core types can be precisely stringified
+ * Custom types are represented by their parent JSON-type
+ * @returns {*}
+ */
+Field.prototype.toJSON = function () {
+	return this.type.convertToJSON(this.extra)
 }

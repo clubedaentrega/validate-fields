@@ -93,4 +93,32 @@ describe('readme examples', function () {
 		validate('divBy17', 35).should.be.false
 		validate('divBy35', 35).should.be.true
 	})
+
+	it('should work for serialization examples', function () {
+		var fields = validate.parse({
+			name: String,
+			age: 'uint',
+			'birth?': Date
+		})
+		JSON.stringify(fields).should.be.equal('{"name":"$String","age":"uint","birth?":"$Date"}')
+
+		var fields2 = validate.parse({
+				myType: 'divBy7'
+			}) // defined above
+		JSON.stringify(fields2).should.be.equal('{"myType":"$Number"}')
+
+		var serializedFields = '{"name":"$String","age":"uint","birth?":"$Date"}'
+		var definition = JSON.parse(serializedFields, validate.reviver)
+		definition.should.be.eql({
+			name: String,
+			age: 'uint',
+			'birth?': Date
+		})
+		var fields3 = validate.parse(definition)
+
+		fields3.validate({
+			name: 'John',
+			age: 12
+		}).should.be.true
+	})
 })

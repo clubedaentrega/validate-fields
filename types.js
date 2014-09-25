@@ -82,6 +82,17 @@ register(function (definition, parse) {
 	}
 
 	return value
+}, function (extra) {
+	var key, ret = Object.create(null)
+
+	for (key in extra.required) {
+		ret[key] = extra.required[key].toJSON()
+	}
+	for (key in extra.optional) {
+		ret[key + '?'] = extra.optional[key].toJSON()
+	}
+
+	return ret
 })
 
 /**
@@ -106,13 +117,15 @@ register(function (definition, parse) {
 		value[i] = extra._validate(value[i], subpath, options)
 	}
 	return value
+}, function (extra) {
+	return [extra.toJSON()]
 })
 
 /**
  * A number (double)
  * Example: {name: String, value: Number}
  */
-register(Number, 'number')
+register(Number, 'number', null, '$Number')
 
 /**
  * A non-empty string (unless in a hash map, marked as optional)
@@ -124,7 +137,7 @@ register(String, 'string', function (value, path, _, options) {
 		throw new Error('I was expecting a non-empty string in ' + path)
 	}
 	return options.escape ? escape(value) : value
-})
+}, '$String')
 
 /**
  * A non-null generic object. No property is validated inside the object
@@ -134,7 +147,7 @@ register(Object, 'object', function (value, path) {
 	if (value === null) {
 		throw new Error('I was expecting a non-null object in ' + path)
 	}
-})
+}, '$Object')
 
 /**
  * A non-empty generic array. No element is validated inside the array
@@ -144,10 +157,10 @@ register(Array, 'array', function (value, path) {
 	if (value.length === 0) {
 		throw new Error('I was expecting a non-empty array in ' + path)
 	}
-})
+}, '$Array')
 
 /** A bool value */
-register(Boolean, 'boolean')
+register(Boolean, 'boolean', null, '$Boolean')
 
 /**
  * A date value in string format (like '2014-08-08T16:14:16.046Z')
@@ -161,7 +174,7 @@ register(Date, 'string', function (value, path) {
 	}
 
 	return date
-})
+}, '$Date')
 
 /**
  * A safe integer
@@ -173,7 +186,7 @@ register('int', 'number', function (value, path) {
 		Math.floor(value) !== value) {
 		throw new Error('I was expecting a integer in ' + path)
 	}
-})
+}, 'int')
 
 /**
  * A safe natural number
@@ -185,7 +198,7 @@ register('uint', 'number', function (value, path) {
 		Math.floor(value) !== value) {
 		throw new Error('I was expecting a natural number in ' + path)
 	}
-})
+}, 'uint')
 
 /**
  * A non-empty string with limited length
@@ -219,6 +232,8 @@ register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, path,
 	}
 
 	return value
+}, function (extra) {
+	return extra[0]
 })
 
 /**
@@ -235,6 +250,8 @@ register(/^hex(\((\d+)\))?$/, 'string', function (value, path, extra) {
 	} else if (extra[2] && value.length !== Number(extra[2])) {
 		throw new Error('I was expecting a string with ' + extra[2] + ' hex-chars in ' + path)
 	}
+}, function (extra) {
+	return extra[0]
 })
 
 /**
@@ -244,7 +261,7 @@ register('id', 'string', function (value, path) {
 	if (!value.match(/^[0-9a-fA-F]{24}$/)) {
 		throw new Error('I was expecting a mongo objectId in ' + path)
 	}
-})
+}, 'id')
 
 /**
  * An email
@@ -258,7 +275,7 @@ register('email', 'string', function (value, path) {
 	if (!value.match(/^[^@]+@.+\.[^.]+$/i)) {
 		throw new Error('I was expecting an email address in ' + path)
 	}
-})
+}, 'email')
 
 /**
  * A string from the given set
@@ -275,6 +292,8 @@ register(function (definition) {
 	if (extra.indexOf(value) === -1) {
 		throw new Error('I was expecting one of [' + extra.join(', ') + '] in ' + path)
 	}
+}, function (extra) {
+	return 'in(' + extra.join(', ') + ')'
 })
 
 /**
@@ -289,4 +308,9 @@ register(function (definition) {
 	if (!value.match(extra)) {
 		throw new Error('I was expecting a string that matches ' + extra + ' in ' + path)
 	}
+}, function (extra) {
+	var flags = (extra.global ? 'g' : '') +
+		(extra.ignoreCase ? 'i' : '') +
+		(extra.multiline ? 'm' : '')
+	return '$RegExp:' + flags + ':' + extra.source
 })
