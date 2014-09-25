@@ -196,17 +196,28 @@ register('uint', 'number', function (value, path) {
  * 'string(8,100)': at most 100, at least 8
  * The string will be HTML escaped if options.escape is true
  */
-register(/^string\((\d+)?,?(\d+)?\)$/, 'string', function (value, path, extra, options) {
+register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, path, extra, options) {
 	if (options.escape) {
 		value = escape(value)
 	}
 	if (value.length === 0) {
 		throw new Error('I was expecting a non-empty string in ' + path)
-	} else if (extra[1] && value.length < Number(extra[1])) {
-		throw new Error('I was expecting at least ' + extra[1] + ' chars in ' + path)
-	} else if (extra[2] && value.length > Number(extra[2])) {
-		throw new Error('I was expecting at most ' + extra[2] + ' chars in ' + path)
 	}
+
+	if (extra[1]) {
+		// Exact length
+		if (value.length !== Number(extra[1])) {
+			throw new Error('I was expecting exactly ' + extra[1] + ' chars in ' + path)
+		}
+	} else {
+		// Min/max length
+		if (extra[2] && value.length < Number(extra[2])) {
+			throw new Error('I was expecting at least ' + extra[2] + ' chars in ' + path)
+		} else if (extra[3] && value.length > Number(extra[3])) {
+			throw new Error('I was expecting at most ' + extra[3] + ' chars in ' + path)
+		}
+	}
+
 	return value
 })
 

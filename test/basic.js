@@ -71,4 +71,10 @@ describe('basic types', function () {
 			a: 'hi'
 		}).should.be.true
 	})
+
+	it('should work for string with fixed size', function () {
+		validate('string(5)', '12345').should.be.true
+		validate('string(5)', '1234').should.be.false
+		validate('string(5)', '123456').should.be.false
+	})
 })
