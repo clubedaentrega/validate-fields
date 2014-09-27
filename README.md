@@ -26,6 +26,9 @@ if (validate(schema, value)) {
 }
 ```
 `validate` throws if it could not understand the schema and returns false if the schema is ok but the value doesn't match the schema.
+
+`validate.lastError`, `validate.lastErrorMessage` and `validate.lastErrorPath` will let you know about the validation error cause
+
 See the list of valid values for the schema bellow
 
 ### Pre-parsing
@@ -103,6 +106,7 @@ Example: `{books: [{title: String, author: String}]}`
 * `Array`: any non-empty array
 * `Boolean`
 * `Date`: any date string accepted by Date constructor (ISO strings are better though)
+* `'*'`: anything (except empty string, null and empty array)
 * `'int'`: a integer between -2^51 and 2^51 (safe integer)
 * `'uint'`: a natural number less than 2^51
 * `'string(17)'`: a string with exactly 17 chars
@@ -137,9 +141,11 @@ In the example bellow, we create a type defined by 'divBy3' that matches JSON nu
 The third param is the check function, that should throw when the value is invalid.
 It may return a new value, that will replace the original value in the object
 ```javascript
-validate.registerType('divBy3', 'number', function (value, path) {
+validate.registerType('divBy3', 'number', function (value) {
 	if (value%3 !== 0) {
-		throw new Error('I was expecting a number divisible by 3 in '+path)
+		// Note: you should throw a string
+		// If you throw an Error instance it won't be caught!
+		throw 'I was expecting a number divisible by 3'
 	}
 	return value/3
 })
@@ -151,10 +157,10 @@ obj.n // 4
 
 In the example bellow, we implement the general case of the above. Instead of a fixed string (divBy3) we define a regex that matches 'divBy' followed by a number. The result of the match goes into the extra array (sent as third parameter to the check function).
 ```javascript
-validate.registerType(/^divBy(\d+)$/, 'number', function (value, path, extra) {
+validate.registerType(/^divBy(\d+)$/, 'number', function (value, extra) {
 	var n = Number(extra[1]) // extra is value returned by String.prototype.match
 	if (value%n !== 0) {
-		throw new Error('I was expecting a number divisible by '+n+' in '+path)
+		throw 'I was expecting a number divisible by '+n
 	}
 	return value/n
 })

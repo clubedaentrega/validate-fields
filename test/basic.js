@@ -29,6 +29,17 @@ describe('basic types', function () {
 		}).should.be.true
 	})
 
+	it('should report the right error', function () {
+		validate({
+			key: Number
+		}, {
+			key: '12'
+		}).should.be.false
+		validate.lastError.should.be.equal('I was expecting number and you gave me string in key')
+		validate.lastErrorMessage.should.be.equal('I was expecting number and you gave me string')
+		validate.lastErrorPath.should.be.equal('key')
+	})
+
 	it('should not escape HTML', function () {
 		var obj = {
 			aNumber: 0,
@@ -89,5 +100,32 @@ describe('basic types', function () {
 		validate('string(5)', '12345').should.be.true
 		validate('string(5)', '1234').should.be.false
 		validate('string(5)', '123456').should.be.false
+	})
+
+	it('should accept anything for *', function () {
+		validate('*', 3.14).should.be.true
+		validate('*', 'Hello').should.be.true
+		validate('*', false).should.be.true
+		validate('*', {
+			a: 2
+		}).should.be.true
+		validate('*', [[3], [14]]).should.be.true
+		validate('*', null).should.be.true
+
+		validate({
+			a: '*'
+		}, {
+			a: 'Something'
+		}).should.be.true
+		validate({
+			a: '*'
+		}, {
+			a: null
+		}).should.be.false
+		validate({
+			'a?': '*'
+		}, {
+			a: null
+		}).should.be.true
 	})
 })

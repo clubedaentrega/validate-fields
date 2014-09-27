@@ -75,9 +75,9 @@ describe('readme examples', function () {
 	})
 
 	it('should work for the simple custom type example', function () {
-		validate.registerType('divBy3', 'number', function (value, path) {
+		validate.registerType('divBy3', 'number', function (value) {
 			if (value % 3 !== 0) {
-				throw new Error('I was expecting a number divisible by 3 in ' + path)
+				throw 'I was expecting a number divisible by 3'
 			}
 			return value / 3
 		})
@@ -91,10 +91,10 @@ describe('readme examples', function () {
 	})
 
 	it('should work for the regex custom type example', function () {
-		validate.registerType(/^divBy(\d+)$/, 'number', function (value, path, extra) {
+		validate.registerType(/^divBy(\d+)$/, 'number', function (value, extra) {
 			var n = Number(extra[1]) // extra is value returned by String.prototype.match
 			if (value % n !== 0) {
-				throw new Error('I was expecting a number divisible by ' + n + ' in ' + path)
+				throw 'I was expecting a number divisible by ' + n
 			}
 			return value / n
 		})

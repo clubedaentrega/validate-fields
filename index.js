@@ -33,6 +33,8 @@ module.exports = function (schema, value, options) {
 	schema = module.exports.parse(schema)
 	var ret = schema.validate(value, options)
 	module.exports.lastError = schema.lastError
+	module.exports.lastErrorMessage = schema.lastErrorMessage
+	module.exports.lastErrorPath = schema.lastErrorPath
 	return ret
 }
 
@@ -101,11 +103,11 @@ module.exports.typedef = function (name, definition) {
 /**
  * @callback checkCallback
  * @param {*} value the value to check
- * @param {string} path a string used in the error message
  * @param {*} extra the result of String.prototype.match if the type is defined with a regexp or the parseCallback result if defined with a function
  * @param {Object} options
+ * @param {string} path a string used in the error message
  * @returns {*} optionally return the altered value
- * @throws if the value is invalid, the message will be put in the lastError property of the validation schema
+ * @throws {string} if the value is invalid, the message will be put in the lastError property of the validation schema
  */
 
 /**

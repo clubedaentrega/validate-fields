@@ -7,10 +7,12 @@
  * @param {toJSONCallback|string} [toJSON]
  */
 function Type(jsonType, checkFn, toJSON) {
+	var types = ['number', 'string', 'boolean', 'object', 'array', '*']
+
 	if (typeof jsonType !== 'string') {
 		throw new Error('jsType must be a string')
-	} else if (jsonType !== 'number' && jsonType !== 'string' && jsonType !== 'boolean' && jsonType !== 'object' && jsonType !== 'array') {
-		throw new Error('jsType must be one of: number, string, boolean, object, array')
+	} else if (types.indexOf(jsonType) === -1) {
+		throw new Error('jsType must be one of: ' + types.join(', '))
 	} else if (typeof checkFn !== 'function') {
 		throw new Error('checkFn must be a function')
 	}
@@ -39,12 +41,17 @@ module.exports = Type
 Type.prototype.validate = function (value, path, extra, options) {
 	var type = typeof value,
 		ret
-	if (this.jsonType === 'array' && !Array.isArray(value)) {
-		throw new Error('I was expecting an array and you gave me ' + type + ' in ' + path)
-	} else if (this.jsonType !== 'array' && this.jsonType !== type) {
-		throw new Error('I was expecting ' + this.jsonType + ' and you gave me ' + type + ' in ' + path)
+	if (this.jsonType !== '*') {
+		if (this.jsonType === 'array' && !Array.isArray(value)) {
+			throw 'I was expecting an array and you gave me ' + type
+		} else if (this.jsonType !== 'array' && this.jsonType !== type) {
+			throw 'I was expecting ' + this.jsonType + ' and you gave me ' + type
+		} else if (this.jsonType === 'object' && !value) {
+			// null
+			throw 'I was expecting an object and you gave me null'
+		}
 	}
-	ret = this.checkFn(value, path, extra, options)
+	ret = this.checkFn(value, extra, options, path)
 	return ret === undefined ? value : ret
 }
 

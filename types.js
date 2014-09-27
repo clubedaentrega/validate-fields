@@ -1,7 +1,8 @@
 'use strict'
 
 var register = require('./index.js').registerType,
-	isEmpty = require('./Type.js').isEmpty
+	isEmpty = require('./Type.js').isEmpty,
+	ValidationError = require('./ValidationError')
 
 /**
  * @param {string} str
@@ -56,7 +57,7 @@ register(function (definition, parse) {
 	})
 
 	return extra
-}, 'object', function (value, path, extra, options) {
+}, 'object', function (value, extra, options, path) {
 	var key, field, subpath
 
 	// Check required fields
@@ -64,9 +65,9 @@ register(function (definition, parse) {
 		field = extra.required[key]
 		subpath = path ? path + '.' + key : key
 		if (!(key in value)) {
-			throw new Error('I was expecting a value in ' + subpath)
+			throw new ValidationError('I was expecting a value', subpath)
 		} else if (isEmpty(value[key])) {
-			throw new Error('I was expecting a non-empty value in ' + subpath)
+			throw new ValidationError('I was expecting a non-empty value', subpath)
 		}
 		value[key] = field._validate(value[key], subpath, options)
 	}
@@ -87,8 +88,9 @@ register(function (definition, parse) {
 	if (options.strict) {
 		// Check for extraneous fields
 		for (key in value) {
+			subpath = path ? path + '.' + key : key
 			if (!(key in extra.required) && !(key in extra.optional)) {
-				throw new Error('I wasn\'t expecting a value in ' + path)
+				throw new ValidationError('I wasn\'t expecting a value', subpath)
 			}
 		}
 	}
@@ -119,10 +121,10 @@ register(function (definition, parse) {
 	}
 
 	return parse(definition[0])
-}, 'array', function (value, path, extra, options) {
+}, 'array', function (value, extra, options, path) {
 	var i, subpath
 	if (value.length === 0) {
-		throw new Error('I was expecting a non-empty array in ' + path)
+		throw 'I was expecting a non-empty array'
 	}
 	for (i = 0; i < value.length; i++) {
 		subpath = path ? path + '.' + i : i
@@ -144,9 +146,9 @@ register(Number, 'number', null, '$Number')
  * Example: {name: {first: String, 'last?': String}}
  * The string will be HTML escaped if options.escape is true
  */
-register(String, 'string', function (value, path, _, options) {
+register(String, 'string', function (value, _, options) {
 	if (value.length === 0) {
-		throw new Error('I was expecting a non-empty string in ' + path)
+		throw 'I was expecting a non-empty string'
 	}
 	return options.escape ? escape(value) : value
 }, '$String')
@@ -155,9 +157,9 @@ register(String, 'string', function (value, path, _, options) {
  * A non-null generic object. No property is validated inside the object
  * Example: {date: Date, event: Object}
  */
-register(Object, 'object', function (value, path) {
+register(Object, 'object', function (value) {
 	if (value === null) {
-		throw new Error('I was expecting a non-null object in ' + path)
+		throw 'I was expecting a non-null object'
 	}
 }, '$Object')
 
@@ -165,9 +167,9 @@ register(Object, 'object', function (value, path) {
  * A non-empty generic array. No element is validated inside the array
  * Example: {arrayOfThings: Array}
  */
-register(Array, 'array', function (value, path) {
+register(Array, 'array', function (value) {
 	if (value.length === 0) {
-		throw new Error('I was expecting a non-empty array in ' + path)
+		throw 'I was expecting a non-empty array'
 	}
 }, '$Array')
 
@@ -179,36 +181,41 @@ register(Boolean, 'boolean', null, '$Boolean')
  * It will convert the string into a date object
  * It accepts all formats defined by the Date(str) constructor, but the a ISO string is recommended
  */
-register(Date, 'string', function (value, path) {
+register(Date, 'string', function (value) {
 	var date = new Date(value)
 	if (Number.isNaN(date.getTime())) {
-		throw new Error('I was expecting a date string in ' + path)
+		throw 'I was expecting a date string'
 	}
 
 	return date
 }, '$Date')
 
 /**
+ * Any type
+ */
+register('*', '*', null, '*')
+
+/**
  * A safe integer
  */
-register('int', 'number', function (value, path) {
+register('int', 'number', function (value) {
 	if (!Number.isFinite(value) ||
 		value <= -9007199254740992 ||
 		value >= 9007199254740992 ||
 		Math.floor(value) !== value) {
-		throw new Error('I was expecting a integer in ' + path)
+		throw 'I was expecting a integer'
 	}
 }, 'int')
 
 /**
  * A safe natural number
  */
-register('uint', 'number', function (value, path) {
+register('uint', 'number', function (value) {
 	if (!Number.isFinite(value) ||
 		value < 0 ||
 		value >= 9007199254740992 ||
 		Math.floor(value) !== value) {
-		throw new Error('I was expecting a natural number in ' + path)
+		throw 'I was expecting a natural number'
 	}
 }, 'uint')
 
@@ -221,25 +228,25 @@ register('uint', 'number', function (value, path) {
  * 'string(8,100)': at most 100, at least 8
  * The string will be HTML escaped if options.escape is true
  */
-register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, path, extra, options) {
+register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, extra, options) {
 	if (options.escape) {
 		value = escape(value)
 	}
 	if (value.length === 0) {
-		throw new Error('I was expecting a non-empty string in ' + path)
+		throw 'I was expecting a non-empty string'
 	}
 
 	if (extra[1]) {
 		// Exact length
 		if (value.length !== Number(extra[1])) {
-			throw new Error('I was expecting exactly ' + extra[1] + ' chars in ' + path)
+			throw 'I was expecting exactly ' + extra[1] + ' chars'
 		}
 	} else {
 		// Min/max length
 		if (extra[2] && value.length < Number(extra[2])) {
-			throw new Error('I was expecting at least ' + extra[2] + ' chars in ' + path)
+			throw 'I was expecting at least ' + extra[2] + ' chars'
 		} else if (extra[3] && value.length > Number(extra[3])) {
-			throw new Error('I was expecting at most ' + extra[3] + ' chars in ' + path)
+			throw 'I was expecting at most ' + extra[3] + ' chars'
 		}
 	}
 
@@ -254,13 +261,13 @@ register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, path,
  * 'hex': a non-empty hex string
  * 'hex(12)': a hex-string with exactly 12 hex-chars (that is, 6 bytes)
  */
-register(/^hex(\((\d+)\))?$/, 'string', function (value, path, extra) {
+register(/^hex(\((\d+)\))?$/, 'string', function (value, extra) {
 	if (value.length === 0) {
-		throw new Error('I was expecting a non-empty string in ' + path)
+		throw 'I was expecting a non-empty string'
 	} else if (!value.match(/^[0-9a-fA-F]+$/)) {
-		throw new Error('I was expecting a hex-encoded string in ' + path)
+		throw 'I was expecting a hex-encoded string'
 	} else if (extra[2] && value.length !== Number(extra[2])) {
-		throw new Error('I was expecting a string with ' + extra[2] + ' hex-chars in ' + path)
+		throw 'I was expecting a string with ' + extra[2] + ' hex-chars'
 	}
 }, function (extra) {
 	return extra[0]
@@ -269,9 +276,9 @@ register(/^hex(\((\d+)\))?$/, 'string', function (value, path, extra) {
 /**
  * A mongo objectId as a 24-hex-char string
  */
-register('id', 'string', function (value, path) {
+register('id', 'string', function (value) {
 	if (!value.match(/^[0-9a-fA-F]{24}$/)) {
-		throw new Error('I was expecting a mongo objectId in ' + path)
+		throw 'I was expecting a mongo objectId'
 	}
 }, 'id')
 
@@ -282,10 +289,10 @@ register('id', 'string', function (value, path) {
  * 2) The right way to check if a email is valid is trying to send an message to it!
  *    (even this is broken: it's easy to get a temporary trash mailbox)
  */
-register('email', 'string', function (value, path) {
+register('email', 'string', function (value) {
 	// The regex forces one '@', followed by at least one '.'
 	if (!value.match(/^[^@]+@.+\.[^.]+$/i)) {
-		throw new Error('I was expecting an email address in ' + path)
+		throw 'I was expecting an email address'
 	}
 }, 'email')
 
@@ -300,9 +307,9 @@ register(function (definition) {
 		return
 	}
 	return definition.substring(3, definition.length - 1).trim().split(/\s*,\s*/)
-}, 'string', function (value, path, extra) {
+}, 'string', function (value, extra) {
 	if (extra.indexOf(value) === -1) {
-		throw new Error('I was expecting one of [' + extra.join(', ') + '] in ' + path)
+		throw 'I was expecting one of [' + extra.join(', ') + ']'
 	}
 }, function (extra) {
 	return 'in(' + extra.join(', ') + ')'
@@ -316,9 +323,9 @@ register(function (definition) {
 	if (definition instanceof RegExp) {
 		return definition
 	}
-}, 'string', function (value, path, extra) {
+}, 'string', function (value, extra) {
 	if (!value.match(extra)) {
-		throw new Error('I was expecting a string that matches ' + extra + ' in ' + path)
+		throw 'I was expecting a string that matches ' + extra
 	}
 }, function (extra) {
 	var flags = (extra.global ? 'g' : '') +

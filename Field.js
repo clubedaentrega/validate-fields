@@ -18,6 +18,8 @@ function Field(type, extra) {
 
 module.exports = Field
 
+var ValidationError = require('./ValidationError')
+
 /**
  * Check if the value is follows the fields schema
  * @param {*} value The value can be altered by the validation
@@ -29,8 +31,14 @@ Field.prototype.validate = function (value, options) {
 	try {
 		this._validate(value, '', options)
 	} catch (e) {
-		this.lastError = e.message
-		return false
+		if (e instanceof ValidationError) {
+			this.lastError = e.message + ' in ' + e.path
+			this.lastErrorMessage = e.message
+			this.lastErrorPath = e.path
+			return false
+		} else {
+			throw e
+		}
 	}
 	this.lastError = ''
 	return true
@@ -42,10 +50,18 @@ Field.prototype.validate = function (value, options) {
  * @param {string} path
  * @param {Object} options
  * @returns {*} the parsed value
- * @throws if is invalid
+ * @throws {ValidationError}
  */
 Field.prototype._validate = function (value, path, options) {
-	return this.type.validate(value, path, this.extra, options)
+	try {
+		return this.type.validate(value, path, this.extra, options)
+	} catch (e) {
+		if (typeof e === 'string') {
+			// Convert from string to error
+			throw new ValidationError(e, path)
+		}
+		throw e
+	}
 }
 
 /**
