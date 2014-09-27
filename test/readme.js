@@ -40,6 +40,14 @@ describe('readme examples', function () {
 		v[0].should.be.equal('&lt;html&gt;')
 	})
 
+	it('should work for the strict matching example', function () {
+		validate({}, {
+			a: 2
+		}, {
+			strict: true
+		}).should.be.false
+	})
+
 	it('should work for the hash map example', function () {
 		var obj = {
 			a: '',

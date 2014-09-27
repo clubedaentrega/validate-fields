@@ -20,6 +20,9 @@ function escape(str) {
  * Example: {name: String, age: Number, dates: {birth: Date, 'death?': Date}}
  * If the key name ends with '?' that field is optional
  * After validation, a field will never be empty (like '' or []). If it's marked as optional, it will be either non-empty or not-present ('key' in obj === false)
+ *
+ * If options.strict is set, extraneous fields will be considered as invalid.
+ * Example: validate({}, {a: 2}, {strict: true}) // false: I wasn't expecting a value in a
  */
 register(function (definition, parse) {
 	var extra
@@ -77,6 +80,15 @@ register(function (definition, parse) {
 				delete value[key]
 			} else {
 				value[key] = field._validate(value[key], subpath, options)
+			}
+		}
+	}
+
+	if (options.strict) {
+		// Check for extraneous fields
+		for (key in value) {
+			if (!(key in extra.required) && !(key in extra.optional)) {
+				throw new Error('I wasn\'t expecting a value in ' + path)
 			}
 		}
 	}

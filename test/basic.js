@@ -38,6 +38,19 @@ describe('basic types', function () {
 		obj.aString.should.be.equal('escape <html>')
 	})
 
+	it('should not allow extraneous keys in strict mode', function () {
+		validate({
+			a: Number,
+			'b?': Number
+		}, {
+			a: 3,
+			b: 14,
+			c: 15
+		}, {
+			strict: true
+		}).should.be.false
+	})
+
 	it('should escape HTML when told to', function () {
 		var obj = {
 			aNumber: 0,

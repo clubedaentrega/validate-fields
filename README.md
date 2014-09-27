@@ -68,6 +68,17 @@ validate.parse([String]).validate(v, {
 v[0] === 'html&gt;'
 ```
 
+## Strict matching
+By default, extra keys are not considered errors:
+```javascript
+validate({}, {a: 2}) // true
+```
+
+This can be changed with the `strict` option:
+```javascript
+validate({}, {a: 2}, {strict: true}) // false
+```
+
 ## Standard types
 
 ### Hash map (object)
