@@ -128,4 +128,16 @@ describe('basic types', function () {
 			a: null
 		}).should.be.true
 	})
+
+	it('should not consider an array a valid object (and vice versa)', function () {
+		validate({
+			0: Number,
+			length: Number
+		}, [12]).should.be.false
+
+		validate([Number], {
+			0: 12,
+			length: 1
+		}).should.be.false
+	})
 })

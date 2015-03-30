@@ -39,17 +39,10 @@ module.exports = Type
  * @throws if invalid
  */
 Type.prototype.validate = function (value, path, extra, options) {
-	var type = typeof value,
+	var type = Array.isArray(value) ? 'array' : (value === null ? 'null' : typeof value),
 		ret
-	if (this.jsonType !== '*') {
-		if (this.jsonType === 'array' && !Array.isArray(value)) {
-			throw 'I was expecting an array and you gave me ' + type
-		} else if (this.jsonType !== 'array' && this.jsonType !== type) {
-			throw 'I was expecting ' + this.jsonType + ' and you gave me ' + type
-		} else if (this.jsonType === 'object' && !value) {
-			// null
-			throw 'I was expecting an object and you gave me null'
-		}
+	if (this.jsonType !== '*' && this.jsonType !== type) {
+		throw 'I was expecting ' + this.jsonType + ' and you gave me ' + type
 	}
 	ret = this.checkFn(value, extra, options, path)
 	return ret === undefined ? value : ret
