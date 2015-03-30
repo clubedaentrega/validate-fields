@@ -1,7 +1,6 @@
 'use strict'
 
 var register = require('./index.js').registerType,
-	isEmpty = require('./Type.js').isEmpty,
 	ValidationError = require('./ValidationError')
 
 /**
@@ -66,7 +65,7 @@ register(function (definition, parse) {
 		subpath = path ? path + '.' + key : key
 		if (!(key in value)) {
 			throw new ValidationError('I was expecting a value', subpath)
-		} else if (isEmpty(value[key])) {
+		} else if (field.type.isEmpty(value[key])) {
 			throw new ValidationError('I was expecting a non-empty value', subpath)
 		}
 		value[key] = field._validate(value[key], subpath, options)
@@ -77,7 +76,7 @@ register(function (definition, parse) {
 		field = extra.optional[key]
 		subpath = path ? path + '.' + key : key
 		if (key in value) {
-			if (isEmpty(value[key])) {
+			if (field.type.isEmpty(value[key])) {
 				delete value[key]
 			} else {
 				value[key] = field._validate(value[key], subpath, options)

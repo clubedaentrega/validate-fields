@@ -52,11 +52,11 @@ Type.prototype.validate = function (value, path, extra, options) {
  * @param {*} value
  * @returns {boolean} whether the given value is considered empty
  */
-Type.isEmpty = function (value) {
-	return value === '' ||
-		value === undefined ||
+Type.prototype.isEmpty = function (value) {
+	return value === undefined ||
 		value === null ||
-		(Array.isArray(value) && value.length === 0)
+		(this.jsonType === 'string' && value === '') ||
+		(this.jsonType === 'array' && Array.isArray(value) && value.length === 0)
 }
 
 // Lazy loaded require('./index').parse
