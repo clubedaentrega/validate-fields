@@ -1,6 +1,7 @@
 'use strict'
 
 var register = require('./index.js').registerType,
+	registerTagged = require('./index.js').registerTaggedType,
 	isEmpty = require('./Type.js').isEmpty,
 	ValidationError = require('./ValidationError')
 
@@ -228,7 +229,14 @@ register('uint', 'number', function (value) {
  * 'string(8,100)': at most 100, at least 8
  * The string will be HTML escaped if options.escape is true
  */
-register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, extra, options) {
+registerTagged({
+	tag: 'string',
+	jsonType: 'string',
+	minArgs: 1,
+	maxArgs: 2,
+	sparse: true,
+	numeric: true
+}, function (value, args, options) {
 	if (options.escape) {
 		value = escape(value)
 	}
@@ -236,23 +244,23 @@ register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, extra
 		throw 'I was expecting a non-empty string'
 	}
 
-	if (extra[1]) {
+	if (args.length === 1) {
 		// Exact length
-		if (value.length !== Number(extra[1])) {
-			throw 'I was expecting exactly ' + extra[1] + ' chars'
+		if (value.length !== args[0]) {
+			throw 'I was expecting exactly ' + args[0] + ' chars'
 		}
 	} else {
 		// Min/max length
-		if (extra[2] && value.length < Number(extra[2])) {
-			throw 'I was expecting at least ' + extra[2] + ' chars'
-		} else if (extra[3] && value.length > Number(extra[3])) {
-			throw 'I was expecting at most ' + extra[3] + ' chars'
+		if (args[0] !== undefined && value.length < args[0]) {
+			throw 'I was expecting at least ' + args[0] + ' chars'
+		} else if (args[1] !== undefined && value.length > args[1]) {
+			throw 'I was expecting at most ' + args[1] + ' chars'
 		}
 	}
 
 	return value
 }, function (extra) {
-	return extra[0]
+	return extra.original
 })
 
 /**
@@ -261,16 +269,21 @@ register(/^string\((?:(\d+)|(\d+)?,(\d+)?)\)$/, 'string', function (value, extra
  * 'hex': a non-empty hex string
  * 'hex(12)': a hex-string with exactly 12 hex-chars (that is, 6 bytes)
  */
-register(/^hex(\((\d+)\))?$/, 'string', function (value, extra) {
+registerTagged({
+	tag: 'hex',
+	jsonType: 'string',
+	maxArgs: 1,
+	numeric: true
+}, function (value, args) {
 	if (value.length === 0) {
 		throw 'I was expecting a non-empty string'
 	} else if (!value.match(/^[0-9a-fA-F]+$/)) {
 		throw 'I was expecting a hex-encoded string'
-	} else if (extra[2] && value.length !== Number(extra[2])) {
-		throw 'I was expecting a string with ' + extra[2] + ' hex-chars'
+	} else if (args.length && value.length !== args[0]) {
+		throw 'I was expecting a string with ' + args[0] + ' hex-chars'
 	}
 }, function (extra) {
-	return extra[0]
+	return extra.original
 })
 
 /**
@@ -284,7 +297,7 @@ register('id', 'string', function (value) {
 
 /**
  * An email
- * Note: this regex isn't much strict on purpose:
+ * Note: this regex isn't much strict on purpose, since:
  * 1) There is no complete regex that matches exactly the spec
  * 2) The right way to check if a email is valid is trying to send an message to it!
  *    (even this is broken: it's easy to get a temporary trash mailbox)
@@ -300,19 +313,15 @@ register('email', 'string', function (value) {
  * A string from the given set
  * Example: 'in(red, green, blue)' matches 'red', 'green' and 'blue', but no other
  */
-register(function (definition) {
-	if (typeof definition !== 'string') {
-		return
-	} else if (definition.substr(0, 3) !== 'in(' || definition.substr(-1) !== ')') {
-		return
-	}
-	return definition.substring(3, definition.length - 1).trim().split(/\s*,\s*/)
-}, 'string', function (value, extra) {
-	if (extra.indexOf(value) === -1) {
-		throw 'I was expecting one of [' + extra.join(', ') + ']'
+registerTagged({
+	tag: 'in',
+	jsonType: 'string'
+}, function (value, args) {
+	if (args.indexOf(value) === -1) {
+		throw 'I was expecting one of [' + args.join(', ') + ']'
 	}
 }, function (extra) {
-	return 'in(' + extra.join(', ') + ')'
+	return extra.original
 })
 
 /**

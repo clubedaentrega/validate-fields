@@ -102,6 +102,33 @@ describe('basic types', function () {
 		validate('string(5)', '123456').should.be.false
 	})
 
+	it('should work for string with min and max size', function () {
+		validate('string(,5)', '12345').should.be.true
+		validate('string(,5)', '123456').should.be.false
+
+		validate('string(5,)', '1234').should.be.false
+		validate('string(5,)', '12345').should.be.true
+
+		validate('string(5,6)', '1234').should.be.false
+		validate('string(5,6)', '12345').should.be.true
+		validate('string(5,6)', '123456').should.be.true
+		validate('string(5,6)', '1234567').should.be.false
+	})
+
+	it('should work for hex strings', function () {
+		validate('hex', 'babaca').should.be.true
+		validate('hex', 'babacx').should.be.false
+		validate('hex(2)', 'ab').should.be.true
+		validate('hex(2)', 'abab').should.be.false
+	})
+
+	it('should work for set of strings', function () {
+		validate('in(ab, cd, ef)', 'ab').should.be.true
+		validate('in(ab, cd, ef)', 'gh').should.be.false
+		validate('in()', 'a').should.be.false
+		validate('in(1, 2, 3)', 2).should.be.false
+	})
+
 	it('should accept anything for *', function () {
 		validate('*', 3.14).should.be.true
 		validate('*', 'Hello').should.be.true

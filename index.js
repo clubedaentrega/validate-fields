@@ -21,6 +21,9 @@ var callbackTypes = {
 	types: []
 }
 
+/** Store types defined by tags */
+var taggedTypes = Object.create(null)
+
 /**
  * Validate the given value against the given schema
  * @param {*} schema
@@ -51,7 +54,7 @@ module.exports.lastError = ''
  * @throw if the definition is invalid
  */
 module.exports.parse = function (fields) {
-	var pos, i, extra
+	var pos, i, extra, field
 
 	if (typeof fields === 'string' && fields in simpleTypes) {
 		// Type defined by a string
@@ -62,6 +65,8 @@ module.exports.parse = function (fields) {
 	} else if ((pos = objectTypes.objects.indexOf(fields)) !== -1) {
 		// Type defined by an object
 		return new Field(objectTypes.types[pos])
+	} else if (typeof fields === 'string' && (field = parseTagged(fields))) {
+		return field
 	} else {
 		// Search by a type, executing the callbacks
 		for (i = 0; i < callbackTypes.fns.length; i++) {
@@ -74,6 +79,59 @@ module.exports.parse = function (fields) {
 		// Nothing found
 		throw new Error('I couldn\'t understand field definition: ' + fields)
 	}
+}
+
+/**
+ * Try to parse a string definition as a tagged type
+ * @private
+ * @param {string} definition
+ * @returns {?Field}
+ */
+function parseTagged(definition) {
+	var match = definition.match(/^(\w+)(?:\((.*)\))?$/),
+		tag, args, typeInfo
+	if (!match) {
+		return
+	}
+
+	// Get type info
+	tag = match[1]
+	typeInfo = taggedTypes[tag]
+	if (!typeInfo) {
+		return
+	}
+
+	// Parse and check args
+	args = (match[2] || '').trim().split(/\s*,\s*/)
+	if (args.length === 1 && args[0] === '') {
+		// Especial empty case
+		args = []
+	}
+	args = args.map(function (arg, i) {
+		if (!arg) {
+			if (!typeInfo.sparse) {
+				throw new Error('Missing argument at position ' + i + ' for tagged type ' + tag)
+			}
+			return
+		}
+
+		if (typeInfo.numeric) {
+			arg = Number(arg)
+			if (Number.isNaN(arg)) {
+				throw new Error('Invalid numeric argument at position ' + i + ' for tagged type ' + tag)
+			}
+		}
+
+		return arg
+	})
+	args.original = definition
+	if (args.length < typeInfo.minArgs) {
+		throw new Error('Too few arguments for tagged type ' + tag)
+	} else if (typeInfo.maxArgs && args.length > typeInfo.maxArgs) {
+		throw new Error('Too much arguments for tagged type ' + tag)
+	}
+
+	return new Field(typeInfo.type, args)
 }
 
 /**
@@ -163,19 +221,55 @@ module.exports.registerType = function (definition, jsonType, checkFn, toJSON) {
 }
 
 /**
+ * Register a new tagged type
+ * @param {Object} definition
+ * @param {string} definition.tag
+ * @param {string} definition.jsonType One of 'number', 'string', 'boolean', 'object' or 'array'
+ * @parma {number} [definition.minArgs=0]
+ * @parma {number} [definition.maxArgs=0] Zero means no limit
+ * @parma {boolean} [definition.sparse=false] true let some args to be skipped: 'tag(,2,,4)'
+ * @parma {boolean} [definition.numeric=false] true will parse all args as numbers
+ * @param {checkCallback} [checkFn=function(){}]
+ * @param {toJSONCallback|string} [toJSON] - Used only by core types
+ */
+module.exports.registerTaggedType = function (definition, checkFn, toJSON) {
+	if (!definition || typeof definition !== 'object') {
+		throw new Error('Invalid definition (' + definition + '), it must be an object')
+	} else if (!definition.tag || !definition.jsonType) {
+		throw new Error('definition.tag and definition.jsonType are required')
+	}
+
+	var tag = definition.tag,
+		type = new Type(definition.jsonType, checkFn || function () {}, toJSON)
+
+	if (tag in taggedTypes) {
+		throw new Error('Tag ' + tag + ' already registered')
+	}
+
+	taggedTypes[tag] = {
+		type: type,
+		minArgs: definition.minArgs || 0,
+		maxArgs: definition.maxArgs || 0,
+		sparse: Boolean(definition.sparse),
+		numeric: Boolean(definition.numeric)
+	}
+}
+
+/**
  * Return a reference to all registered types
  * You can change it to alter the very inner working of this module
  * The two main types are:
  * * Hash map: callbackTypes.fns[0], callbackTypes.types[0]
  * * Array: callbackTypes.fns[1], callbackTypes.types[1]
- * @returns {{simpleTypes: Object.<string, Type>, typedefs: Field, objectTypes: {objects: Object[], types: Type[]}, callbackTypes: {fns: Function[], types: Type[]}}}
+ * @returns {{simpleTypes: Object.<string, Type>, typedefs: Field, objectTypes: {objects: Object[], types: Type[]}, callbackTypes: {fns: Function[], types: Type[]}}, taggedTypes: Object<string, {type: string, minArgs: number, maxArgs: number, sparse: boolean, numeric: boolean}>}
  */
 module.exports.getRegisteredTypes = function () {
 	return {
 		simpleTypes: simpleTypes,
 		typedefs: typedefs,
 		objectTypes: objectTypes,
-		callbackTypes: callbackTypes
+		callbackTypes: callbackTypes,
+		taggedTypes: taggedTypes
 	}
 }
 
