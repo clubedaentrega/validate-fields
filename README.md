@@ -155,17 +155,24 @@ validate({n: 'divBy3'}, obj) // true
 obj.n // 4
 ```
 
-In the example bellow, we implement the general case of the above. Instead of a fixed string (divBy3) we define a regex that matches 'divBy' followed by a number. The result of the match goes into the extra array (sent as third parameter to the check function).
+In the example bellow, we implement the general case of the above. Instead of a fixed string (divBy3) we define a syntax like `'divBy(n)'` where `n` is a number. The "argument" list is sent as the third parameter to the check function.
 ```javascript
-validate.registerType(/^divBy(\d+)$/, 'number', function (value, extra) {
-	var n = Number(extra[1]) // extra is value returned by String.prototype.match
+validate.registerTaggedType({
+	tag: 'divBy',
+    jsonType: 'number',
+    minArgs: 1, // default = 0. If 0, 'tag' and 'tag()' are equal
+    maxArgs: 1, // default = 0 = no limit
+    sparse: false, // default = false. If true, let arguments be skipped: 'tag(1,,2)'
+    numeric: true // default = false. If true, parse all arguments as numbers
+}, function (value, args) {
+	var n = args[0]
 	if (value%n !== 0) {
 		throw 'I was expecting a number divisible by '+n
 	}
 	return value/n
 })
-validate('divBy17', 35) // false
-validate('divBy35', 35) // true
+validate('divBy(17)', 35) // false
+validate('divBy(35)', 35) // true
 ```
 See more examples in the file `types.js`
 
@@ -178,7 +185,7 @@ JSON.stringify(fields) // '{"name":"$String","age":"uint","birth?":"$Date"}'
 
 Note that custom types can't be serialized, they are replaced by their JSON-type:
 ```javascript
-var fields = validate.parse({myType: 'divBy7'}) // defined above
+var fields = validate.parse({myType: 'divBy(7)'}) // defined above
 JSON.stringify(fields) // '{"myType":"$Number"}'
 ```
 

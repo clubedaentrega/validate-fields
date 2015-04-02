@@ -90,16 +90,23 @@ describe('readme examples', function () {
 		obj.n.should.be.equal(4)
 	})
 
-	it('should work for the regex custom type example', function () {
-		validate.registerType(/^divBy(\d+)$/, 'number', function (value, extra) {
-			var n = Number(extra[1]) // extra is value returned by String.prototype.match
+	it('should work for the tagged custom type example', function () {
+		validate.registerTaggedType({
+			tag: 'divBy',
+			jsonType: 'number',
+			minArgs: 1,
+			maxArgs: 1,
+			sparse: false,
+			numeric: true
+		}, function (value, args) {
+			var n = args[0]
 			if (value % n !== 0) {
 				throw 'I was expecting a number divisible by ' + n
 			}
 			return value / n
 		})
-		validate('divBy17', 35).should.be.false
-		validate('divBy35', 35).should.be.true
+		validate('divBy(17)', 35).should.be.false
+		validate('divBy(35)', 35).should.be.true
 	})
 
 	it('should work for serialization examples', function () {
@@ -111,7 +118,7 @@ describe('readme examples', function () {
 		JSON.stringify(fields).should.be.equal('{"name":"$String","age":"uint","birth?":"$Date"}')
 
 		var fields2 = validate.parse({
-				myType: 'divBy7'
+				myType: 'divBy(7)'
 			}) // defined above
 		JSON.stringify(fields2).should.be.equal('{"myType":"$Number"}')
 
