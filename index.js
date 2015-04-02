@@ -312,4 +312,4 @@ module.exports.reviver = function (key, value) {
 }
 
 // Register standard types
-require('./types.js')
+require('./types')

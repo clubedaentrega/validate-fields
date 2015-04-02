@@ -180,7 +180,7 @@ validate.registerTaggedType({
 validate('divBy(17)', 35) // false
 validate('divBy(35)', 35) // true
 ```
-See more examples in the file `types.js`
+See more examples in the folder `types`. All core types are defined there
 
 ## Interchangeable format
 A parsed `Field` can be serialized to JSON with `JSON.stringify()`:
