@@ -129,6 +129,54 @@ describe('basic types', function () {
 		validate('in(1, 2, 3)', 2).should.be.false
 	})
 
+	it('should work for numeric types', function () {
+		validate(Number, 3.14).should.be.true
+		validate(Number, '3.14').should.be.false
+
+		validate('int', -3).should.be.true
+		validate('int', 3).should.be.true
+		validate('int', '3').should.be.false
+
+		validate('uint', -3).should.be.false
+		validate('uint', 3).should.be.true
+		validate('uint', '3').should.be.false
+	})
+
+	it('should work for numeric ranges', function () {
+		validate('number(-2.5, 3.5)', -2.6).should.be.false
+		validate('number(-2.5, 3.5)', -2.5).should.be.true
+		validate('number(-2.5, 3.5)', -2).should.be.true
+		validate('number(-2.5, 3.5)', 0).should.be.true
+		validate('number(-2.5, 3.5)', 3).should.be.true
+		validate('number(-2.5, 3.5)', 3.5).should.be.true
+		validate('number(-2.5, 3.5)', 3.6).should.be.false
+
+		validate('int(-2.5, 3.5)', -2.6).should.be.false
+		validate('int(-2.5, 3.5)', -2.5).should.be.false
+		validate('int(-2.5, 3.5)', -2).should.be.true
+		validate('int(-2.5, 3.5)', 0).should.be.true
+		validate('int(-2.5, 3.5)', 3).should.be.true
+		validate('int(-2.5, 3.5)', 3.5).should.be.false
+		validate('int(-2.5, 3.5)', 3.6).should.be.false
+
+		validate('uint(-2.5, 3.5)', -2.6).should.be.false
+		validate('uint(-2.5, 3.5)', -2.5).should.be.false
+		validate('uint(-2.5, 3.5)', -2).should.be.false
+		validate('uint(-2.5, 3.5)', 0).should.be.true
+		validate('uint(-2.5, 3.5)', 3).should.be.true
+		validate('uint(-2.5, 3.5)', 3.5).should.be.false
+		validate('uint(-2.5, 3.5)', 3.6).should.be.false
+	})
+
+	it('should work for set of numbers', function () {
+		validate('numberIn(3, 1.4, -15)', 3).should.be.true
+		validate('numberIn(3, 1.4, -15)', 1.4).should.be.true
+		validate('numberIn(3, 1.4, -15)', -15).should.be.true
+
+		validate('numberIn(3, 1.4, -15)', 0).should.be.false
+		validate('numberIn(3, 1.4, -15)', '3').should.be.false
+	})
+
 	it('should accept anything for *', function () {
 		validate('*', 3.14).should.be.true
 		validate('*', 'Hello').should.be.true

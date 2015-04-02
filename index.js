@@ -101,6 +101,11 @@ function parseTagged(definition) {
 		return
 	}
 
+	// Special no-'()' case: only match 'tag' if minArgs is zero
+	if (typeInfo.minArgs > 0 && match[2] === undefined) {
+		return
+	}
+
 	// Parse and check args
 	args = (match[2] || '').trim().split(/\s*,\s*/)
 	if (args.length === 1 && args[0] === '') {
