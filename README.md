@@ -101,12 +101,12 @@ Example: `{books: [{title: String, author: String}]}`
 
 ### Other types
 * `Number`: a double
-* `String`: a non-empty string
+* `String`: a string
 * `Object`: any non-null object
-* `Array`: any non-empty array
+* `Array`: any array
 * `Boolean`
 * `Date`: any date string accepted by Date constructor (ISO strings are better though)
-* `'*'`: anything (except empty string, null and empty array)
+* `'*'`: anything
 * `'number(-3.5,10)'`: a number `x` with `-3.5 <= x <= 10`
 * `'number(-3.5,)'`: a number `x` with `-3.5 <= x`
 * `'number(,10)'`: a number `x` with `x <= 10`
@@ -118,7 +118,7 @@ Example: `{books: [{title: String, author: String}]}`
 * `'string(,100)'`: at most 100 chars
 * `'string(8,)'`: at least 8 chars
 * `'string(8,100)'`: at most 100, at least 8
-* `'hex'`: a non-empty hex string
+* `'hex'`: a hex string
 * `'hex(12)'`: a hex-string with exactly 12 hex-chars (that is, 6 bytes)
 * `'id'`: a mongo objectId as a 24-hex-char string
 * `'email'`: a string that looks like an email address

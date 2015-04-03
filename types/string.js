@@ -9,9 +9,6 @@ var register = require('../').registerType,
  * The string will be HTML escaped if options.escape is true
  */
 register(String, 'string', function (value, _, options) {
-	if (value.length === 0) {
-		throw 'I was expecting a non-empty string'
-	}
 	return options.escape ? escape(value) : value
 }, '$String')
 
@@ -49,9 +46,6 @@ registerTagged({
 	if (options.escape) {
 		value = escape(value)
 	}
-	if (value.length === 0) {
-		throw 'I was expecting a non-empty string'
-	}
 
 	if (args.length === 1) {
 		// Exact length
@@ -84,9 +78,7 @@ registerTagged({
 	maxArgs: 1,
 	numeric: true
 }, function (value, args) {
-	if (value.length === 0) {
-		throw 'I was expecting a non-empty string'
-	} else if (!value.match(/^[0-9a-fA-F]+$/)) {
+	if (!value.match(/^[0-9a-fA-F]+$/)) {
 		throw 'I was expecting a hex-encoded string'
 	} else if (args.length && value.length !== args[0]) {
 		throw 'I was expecting a string with ' + args[0] + ' hex-chars'

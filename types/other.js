@@ -16,11 +16,7 @@ register(Object, 'object', function (value) {
  * A non-empty generic array. No element is validated inside the array
  * Example: {arrayOfThings: Array}
  */
-register(Array, 'array', function (value) {
-	if (value.length === 0) {
-		throw 'I was expecting a non-empty array'
-	}
-}, '$Array')
+register(Array, 'array', null, '$Array')
 
 /** A bool value */
 register(Boolean, 'boolean', null, '$Boolean')

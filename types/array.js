@@ -16,9 +16,6 @@ register(function (definition, parse) {
 	return parse(definition[0])
 }, 'array', function (value, extra, options, path) {
 	var i, subpath
-	if (value.length === 0) {
-		throw 'I was expecting a non-empty array'
-	}
 	for (i = 0; i < value.length; i++) {
 		subpath = path ? path + '.' + i : i
 		value[i] = extra._validate(value[i], subpath, options)
