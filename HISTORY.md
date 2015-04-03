@@ -1,4 +1,10 @@
-# next
+# 2.0.0
+## Breaking changes
+* You must use `var validate = require('validate-fields')()` instead of old `var validate = require('validate-fields')` (note the `()` at the end).
+* `validate(String, '')` now returns `true` instead of `false`
+* `validate({'a?': Number}, {a: ''})` now returns `false` instead of `true`
+
+## Issues closed
 * Added: default values [issue #3](https://github.com/clubedaentrega/validate-fields/issues/3)
 * Changed: new definition of emptiness [issue #2](https://github.com/clubedaentrega/validate-fields/issues/2) [pull #5](https://github.com/clubedaentrega/validate-fields/pull/5)
 * Changed: removed empty check from other places than hash [issue #8](https://github.com/clubedaentrega/validate-fields/issues/8)
