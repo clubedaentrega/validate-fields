@@ -68,19 +68,17 @@ register(function (definition, parse) {
 	for (key in extra.optional) {
 		info = extra.optional[key]
 		subpath = path ? path + '.' + key : key
-		if (key in value) {
-			if (isEmpty(value[key])) {
-				if (info.defaultSource === undefined) {
-					// No default: remove the key
-					delete value[key]
-				} else {
-					// Set to default
-					// JSON.parse won't throw because the source has already been checked
-					value[key] = JSON.parse(info.defaultSource)
-				}
+		if (isEmpty(value[key])) {
+			if (info.defaultSource === undefined) {
+				// No default: remove the key
+				delete value[key]
 			} else {
-				value[key] = info.field._validate(value[key], subpath, options)
+				// Set to default
+				// JSON.parse won't throw because the source has already been checked
+				value[key] = JSON.parse(info.defaultSource)
 			}
+		} else {
+			value[key] = info.field._validate(value[key], subpath, options)
 		}
 	}
 
@@ -165,12 +163,10 @@ function checkDefault(source, field) {
 	try {
 		value = JSON.parse(source)
 	} catch (e) {
-		throw new Error('I was expecting a valid JSON, but got ' + source +
-			'\nParse error: ' + e.message)
+		throw new Error('I was expecting a valid JSON\nParse error: ' + e.message)
 	}
 
 	if (!field.validate(value)) {
-		throw new Error('I was expecting a valid default value' +
-			'\nValidation error: ' + field.lastError)
+		throw new Error('I was expecting a valid default value\nValidation error: ' + field.lastError)
 	}
 }
