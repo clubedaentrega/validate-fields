@@ -1,7 +1,9 @@
 'use strict'
 
-require('./array')
-require('./hash')
-require('./numeric')
-require('./other')
-require('./string')
+module.exports = function (context) {
+	require('./array')(context)
+	require('./hash')(context)
+	require('./numeric')(context)
+	require('./other')(context)
+	require('./string')(context)
+}

@@ -2,7 +2,7 @@
 'use strict'
 
 require('should')
-var validate = require('../index.js')
+var validate = require('../')()
 
 describe('default values', function () {
 	it('should work for basic default values', function () {

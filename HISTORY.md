@@ -2,6 +2,7 @@
 * Added: default values [issue #3](https://github.com/clubedaentrega/validate-fields/issues/3)
 * Changed: new definition of emptiness [issue #2](https://github.com/clubedaentrega/validate-fields/issues/2) [pull #5](https://github.com/clubedaentrega/validate-fields/pull/5)
 * Changed: removed empty check from other places than hash [issue #8](https://github.com/clubedaentrega/validate-fields/issues/8)
+* Changed: no more global registry, create contexts instead [issue #7](https://github.com/clubedaentrega/validate-fields/issues/7)
 
 # 1.4.0
 * Added: new numeric types [issue #1](https://github.com/clubedaentrega/validate-fields/issues/1)

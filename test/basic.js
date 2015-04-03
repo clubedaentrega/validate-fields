@@ -3,7 +3,7 @@
 
 require('should')
 
-var validate = require('../index.js')
+var validate = require('../')()
 
 describe('basic types', function () {
 	var fields

@@ -3,7 +3,7 @@
 
 require('should')
 
-var validate = require('../index.js')
+var validate = require('../')()
 
 describe('benchmark', function () {
 	var parsed

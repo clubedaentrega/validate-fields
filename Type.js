@@ -78,14 +78,12 @@ Type.prototype.convertToJSON = function (extra) {
 	parse = parse || require('./index').parse
 
 	// Aproximated convertion
-	var typesMap = {
-			number: Number,
-			string: String,
-			boolean: Boolean,
-			object: Object,
-			array: Array
-		},
-		type = parse(typesMap[this.jsonType])
-
-	return type.toJSON()
+	return {
+		number: '$Number',
+		string: '$String',
+		boolean: '$Boolean',
+		object: '$Object',
+		array: '$Array',
+		'*': '*'
+	}[this.jsonType]
 }
