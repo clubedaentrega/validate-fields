@@ -74,7 +74,7 @@ register(function (definition, parse) {
 			} else {
 				// Set to default
 				// JSON.parse won't throw because the source has already been checked
-				value[key] = JSON.parse(info.defaultSource)
+				value[key] = info.field._validate(JSON.parse(info.defaultSource), subpath, options)
 			}
 		} else {
 			value[key] = info.field._validate(value[key], subpath, options)
@@ -104,7 +104,7 @@ register(function (definition, parse) {
 		if (info.defaultSource === undefined) {
 			ret[key + '?'] = info.field.toJSON()
 		} else {
-			ret[key + '=' + JSON.stringify(info.defaultSource)] = info.field.toJSON()
+			ret[key + '=' + info.defaultSource] = info.field.toJSON()
 		}
 	}
 

@@ -44,4 +44,19 @@ describe('default values', function () {
 		}
 		boom.should.throw(/^I was expecting a valid default value/)
 	})
+
+	it('should apply subfields default values', function () {
+		var obj = {}
+		validate({
+			'a={}': {
+				'b=2': Number
+			}
+		}, obj)
+
+		obj.should.be.eql({
+			a: {
+				b: 2
+			}
+		})
+	})
 })
