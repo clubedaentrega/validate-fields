@@ -29,24 +29,28 @@ register(function (definition, parse) {
 	}
 
 	Object.keys(definition).forEach(function (key) {
-		var optional = key[key.length - 1] === '?',
-			newKey = optional ? key.substr(0, key.length - 1) : key,
+		var info = parseKey(key),
 			field = parse(definition[key])
 
-		if (newKey in extra.optional || newKey in extra.required) {
+		if (info.name in extra.optional || info.name in extra.required) {
 			throw new Error('You can\'t define the same field twice: ' + key)
 		}
 
-		if (optional) {
-			extra.optional[newKey] = field
+		if (info.optional) {
+			checkDefault(info.defaultSource, field)
+
+			extra.optional[info.name] = {
+				field: field,
+				defaultSource: info.defaultSource
+			}
 		} else {
-			extra.required[newKey] = field
+			extra.required[info.name] = field
 		}
 	})
 
 	return extra
 }, 'object', function (value, extra, options, path) {
-	var key, field, subpath
+	var key, field, subpath, info
 
 	// Check required fields
 	for (key in extra.required) {
@@ -62,13 +66,20 @@ register(function (definition, parse) {
 
 	// Check optional fields
 	for (key in extra.optional) {
-		field = extra.optional[key]
+		info = extra.optional[key]
 		subpath = path ? path + '.' + key : key
 		if (key in value) {
 			if (isEmpty(value[key])) {
-				delete value[key]
+				if (info.defaultSource === undefined) {
+					// No default: remove the key
+					delete value[key]
+				} else {
+					// Set to default
+					// JSON.parse won't throw because the source has already been checked
+					value[key] = JSON.parse(info.defaultSource)
+				}
 			} else {
-				value[key] = field._validate(value[key], subpath, options)
+				value[key] = info.field._validate(value[key], subpath, options)
 			}
 		}
 	}
@@ -85,14 +96,81 @@ register(function (definition, parse) {
 
 	return value
 }, function (extra) {
-	var key, ret = Object.create(null)
+	var ret = Object.create(null),
+		key, info
 
 	for (key in extra.required) {
 		ret[key] = extra.required[key].toJSON()
 	}
 	for (key in extra.optional) {
-		ret[key + '?'] = extra.optional[key].toJSON()
+		info = extra.optional[key]
+		if (info.defaultSource === undefined) {
+			ret[key + '?'] = info.field.toJSON()
+		} else {
+			ret[key + '=' + JSON.stringify(info.defaultSource)] = info.field.toJSON()
+		}
 	}
 
 	return ret
 })
+
+/**
+ * @typedef {Object} KeyInfo
+ * @property {string} name
+ * @property {boolean} optional
+ * @property {?string} defaultSource
+ */
+
+/**
+ * @param {string} key
+ * @returns {KeyInfo}
+ */
+function parseKey(key) {
+	var name = key,
+		optional = false,
+		pos = key.indexOf('='),
+		defaultSource
+
+	if (pos !== -1) {
+		// Optional with default value
+		name = key.substr(0, pos)
+		optional = true
+		defaultSource = key.substr(pos + 1)
+	} else if (key[key.length - 1] === '?') {
+		// Optional without default
+		name = key.substr(0, key.length - 1)
+		optional = true
+	}
+
+	return {
+		name: name,
+		optional: optional,
+		defaultSource: defaultSource
+	}
+}
+
+/**
+ * @param {string} source
+ * @param {Field} field
+ * @throws if invalid
+ */
+function checkDefault(source, field) {
+	var value
+
+	if (source === undefined) {
+		// No default
+		return
+	}
+
+	try {
+		value = JSON.parse(source)
+	} catch (e) {
+		throw new Error('I was expecting a valid JSON, but got ' + source +
+			'\nParse error: ' + e.message)
+	}
+
+	if (!field.validate(value)) {
+		throw new Error('I was expecting a valid default value' +
+			'\nValidation error: ' + field.lastError)
+	}
+}
