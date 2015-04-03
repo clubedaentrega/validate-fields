@@ -12,6 +12,8 @@
 		"json",
 		"express",
 		"validator",
+		"validation",
+		"input",
 		"fields"
 	],
 	"dependencies": {},
