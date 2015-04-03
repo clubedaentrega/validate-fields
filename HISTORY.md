@@ -1,4 +1,5 @@
 # next
+* Added: default values [issue #3](https://github.com/clubedaentrega/validate-fields/issues/3)
 
 # 1.4.0
 * Added: new numeric types [issue #1](https://github.com/clubedaentrega/validate-fields/issues/1)
