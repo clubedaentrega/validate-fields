@@ -87,7 +87,7 @@ validate({}, {a: 2}, {strict: true}) // false
 ### Hash map (object)
 Example: `{a: Number, 'b?': String, c: {d: 'int'}}`
 
-Keys that end in `'?'` are optional (`b`, in the example above). All others must be present and must not empty (that is, neither `''` nor `null` nor `undefined` nor `[]`).
+Keys that end in `'?'` are optional (`b`, in the example above). All others must be present and must not empty. Empty is `null` or `undefined`; for strings, `''` is also considered empty; for arrays, `[]` is also considered empty.
 
 If a value is optional and is empty it will be removed. Example:
 ```javascript
