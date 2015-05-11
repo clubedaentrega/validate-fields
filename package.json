@@ -1,6 +1,6 @@
 {
 	"name": "validate-fields",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"author": "Sitegui <sitegui@sitegui.com.br>",
 	"description": "A simple yet powerful JSON schema validator",
 	"main": "./index.js",
@@ -25,7 +25,7 @@
 		"test": "mocha test"
 	},
 	"devDependencies": {
-		"mocha": "^2.2.1",
-		"should": "^5.2.0"
+		"mocha": "^2.2.4",
+		"should": "^6.0.1"
 	}
 }

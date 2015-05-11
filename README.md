@@ -96,7 +96,6 @@ validate({'a?': String, 'b?': 'int'}, obj) // true
 obj // {}
 ```
 
-#### Default value
 Optional fields may declare a default value to use in its place when empty. Example:
 ```js
 var obj = {}

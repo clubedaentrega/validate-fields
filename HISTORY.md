@@ -1,3 +1,6 @@
+# 2.1.0
+* Changed: `toJSON` is called when present, so now `validate(new Date, Date)` is `true`.
+
 # 2.0.0
 ## Breaking changes
 * You must use `var validate = require('validate-fields')()` instead of old `var validate = require('validate-fields')` (note the `()` at the end).

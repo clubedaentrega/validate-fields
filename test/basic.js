@@ -215,4 +215,20 @@ describe('basic types', function () {
 			length: 1
 		}).should.be.false
 	})
+
+	it('should accept a Date for Date', function () {
+		validate(Date, new Date).should.be.true
+	})
+
+	it('should call toJSON when present', function () {
+		validate({
+			a: Number
+		}, {
+			toJSON: function () {
+				return {
+					a: 12
+				}
+			}
+		}).should.be.true
+	})
 })

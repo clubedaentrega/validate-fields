@@ -39,6 +39,11 @@ module.exports = Type
  * @throws if invalid
  */
 Type.prototype.validate = function (value, path, extra, options) {
+	// Call toJSON() if present
+	if (value !== null && value !== undefined && typeof value.toJSON === 'function') {
+		value = value.toJSON()
+	}
+
 	var type = Array.isArray(value) ? 'array' : (value === null ? 'null' : typeof value),
 		ret
 	if (this.jsonType !== '*' && this.jsonType !== type) {
