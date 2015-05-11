@@ -96,6 +96,16 @@ validate({'a?': String, 'b?': 'int'}, obj) // true
 obj // {}
 ```
 
+#### Default value
+Optional fields may declare a default value to use in its place when empty. Example:
+```js
+var obj = {}
+validate({'a=12': Number, 'b=[]': [String], 'c="hi"': String}, obj) // true
+obj // {a: 12, b: [], c: 'hi'}
+```
+
+The value after the `=` character must be a valid JSON.
+
 ### Array
 Example: `{books: [{title: String, author: String}]}`
 
