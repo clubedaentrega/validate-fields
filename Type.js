@@ -60,8 +60,7 @@ Type.prototype.validate = function (value, path, extra, options) {
 Type.prototype.isEmpty = function (value) {
 	return value === undefined ||
 		value === null ||
-		(this.jsonType === 'string' && value === '') ||
-		(this.jsonType === 'array' && Array.isArray(value) && value.length === 0)
+		(this.jsonType === 'string' && value === '')
 }
 
 // Lazy loaded require('./index').parse

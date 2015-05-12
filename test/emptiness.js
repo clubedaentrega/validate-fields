@@ -45,11 +45,11 @@ describe('emptiness', function () {
 		function check(key) {
 			var obj = {}
 			obj[key] = ''
-			return schema.validate(obj)
+			return schema.validate(obj) && !(key in obj)
 		}
 	})
 
-	it('should consider [] as empty only if the field is of type array', function () {
+	it('should consider [] as valid but not empty if the field is of type array', function () {
 		check('arr').should.be.true
 
 		check('str').should.be.false
@@ -60,7 +60,7 @@ describe('emptiness', function () {
 		function check(key) {
 			var obj = {}
 			obj[key] = []
-			return schema.validate(obj)
+			return schema.validate(obj) && (key in obj)
 		}
 	})
 
