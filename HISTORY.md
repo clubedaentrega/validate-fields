@@ -1,3 +1,10 @@
+# 3.0.0
+## Breaking changes
+* `validate({a: [String]}, {a: []})` now returns `true`
+
+## Issues closed
+*  Changed: do not consider empty array as an empty value [issue #9](https://github.com/clubedaentrega/validate-fields/issues/9) [pull #10](https://github.com/clubedaentrega/validate-fields/pull/10)
+
 # 2.1.0
 * Changed: `toJSON` is called when present, so now `validate(new Date, Date)` is `true`.
 
