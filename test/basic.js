@@ -62,6 +62,26 @@ describe('basic types', function () {
 		}).should.be.false
 	})
 
+	it('should allow and remove extraneous keys with undefined in strict mode', function () {
+		var obj = {
+			a: 3,
+			b: 14,
+			c: undefined
+		}
+
+		validate({
+			a: Number,
+			'b?': Number
+		}, obj, {
+			strict: true
+		}).should.be.true
+
+		obj.should.be.eql({
+			a: 3,
+			b: 14
+		})
+	})
+
 	it('should escape HTML when told to', function () {
 		var obj = {
 			aNumber: 0,

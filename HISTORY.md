@@ -1,3 +1,6 @@
+# 3.1.0
+* Added: remove extraneous keys with `undefined` value in strict mode. Now `validate({}, {a: undefined}, {strict: true})` is `true`
+
 # 3.0.0
 ## Breaking changes
 * `validate({a: [String]}, {a: []})` now returns `true`

@@ -85,7 +85,9 @@ module.exports = function (context) {
 			// Check for extraneous fields
 			for (key in value) {
 				subpath = path ? path + '.' + key : key
-				if (!(key in extra.required) && !(key in extra.optional)) {
+				if (value[key] === undefined) {
+					delete value[key]
+				} else if (!(key in extra.required) && !(key in extra.optional)) {
 					throw new ValidationError('I wasn\'t expecting a value', subpath)
 				}
 			}
