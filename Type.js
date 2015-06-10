@@ -7,7 +7,7 @@
  * @param {toJSONCallback|string} [toJSON]
  */
 function Type(jsonType, checkFn, toJSON) {
-	var types = ['number', 'string', 'boolean', 'object', 'array', '*']
+	var types = ['number', 'string', 'boolean', 'object', 'array', '*', 'raw']
 
 	if (typeof jsonType !== 'string') {
 		throw new Error('jsType must be a string')
@@ -40,13 +40,18 @@ module.exports = Type
  */
 Type.prototype.validate = function (value, path, extra, options) {
 	// Call toJSON() if present
-	if (value !== null && value !== undefined && typeof value.toJSON === 'function') {
+	if (this.jsonType !== 'raw' &&
+		value !== null &&
+		value !== undefined &&
+		typeof value.toJSON === 'function') {
 		value = value.toJSON()
 	}
 
 	var type = Array.isArray(value) ? 'array' : (value === null ? 'null' : typeof value),
 		ret
-	if (this.jsonType !== '*' && this.jsonType !== type) {
+	if (this.jsonType !== '*' &&
+		this.jsonType !== 'raw' &&
+		this.jsonType !== type) {
 		throw 'I was expecting ' + this.jsonType + ' and you gave me ' + type
 	}
 	ret = this.checkFn(value, extra, options, path)
@@ -88,6 +93,7 @@ Type.prototype.convertToJSON = function (extra) {
 		boolean: '$Boolean',
 		object: '$Object',
 		array: '$Array',
-		'*': '*'
+		'*': '*',
+		raw: '*'
 	}[this.jsonType]
 }

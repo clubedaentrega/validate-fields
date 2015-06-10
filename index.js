@@ -125,7 +125,7 @@ module.exports = function () {
 	/**
 	 * Register a new type
 	 * @param {(string|Object|RegExp|parseCallback)} definition
-	 * @param {string} jsonType One of 'number', 'string', 'boolean', 'object' or 'array'
+	 * @param {string} jsonType One of: number, string, boolean, object, array, *, raw
 	 * @param {checkCallback} [checkFn=function(){}]
 	 * @param {toJSONCallback|string} [toJSON] - Used only by core types
 	 */

@@ -98,4 +98,31 @@ describe('JSON', function () {
 			array: Array
 		})
 	})
+
+	it('should call toJSON on values', function () {
+		var called = false
+		validate(String, {
+			toJSON: function () {
+				called = true
+				return 'a string'
+			}
+		}).should.be.true
+		called.should.be.true
+	})
+
+	it('should not call toJSON on raw types', function () {
+		validate.registerType('my-type', 'raw', function () {})
+
+		var called = false
+		validate('my-type', {
+			toJSON: function () {
+				called = true
+				return 'a string'
+			}
+		}).should.be.true
+		called.should.be.false
+
+		// raw is converted to '*'
+		check('my-type', '*')
+	})
 })

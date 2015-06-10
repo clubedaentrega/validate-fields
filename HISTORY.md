@@ -1,3 +1,6 @@
+# 3.2.0
+* Added: json type `'raw'` (like `'*'`, but don't call toJSON)
+
 # 3.1.0
 * Added: remove extraneous keys with `undefined` value in strict mode. Now `validate({}, {a: undefined}, {strict: true})` is `true`
 
