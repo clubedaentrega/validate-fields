@@ -25,7 +25,7 @@ module.exports = function (context) {
 		if (args[0] !== undefined && value < args[0]) {
 			throw 'I was expecting a value greater than ' + args[0]
 		} else if (args[1] !== undefined && value > args[1]) {
-			throw 'I was expecting a value less than ' + args[0]
+			throw 'I was expecting a value less than ' + args[1]
 		}
 	}, function (extra) {
 		return extra.original
@@ -62,7 +62,7 @@ module.exports = function (context) {
 		if (args[0] !== undefined && value < args[0]) {
 			throw 'I was expecting a value greater than ' + args[0]
 		} else if (args[1] !== undefined && value > args[1]) {
-			throw 'I was expecting a value less than ' + args[0]
+			throw 'I was expecting a value less than ' + args[1]
 		}
 	}, function (extra) {
 		return extra.original
@@ -99,7 +99,7 @@ module.exports = function (context) {
 		if (args[0] !== undefined && value < args[0]) {
 			throw 'I was expecting a value greater than ' + args[0]
 		} else if (args[1] !== undefined && value > args[1]) {
-			throw 'I was expecting a value less than ' + args[0]
+			throw 'I was expecting a value less than ' + args[1]
 		}
 	}, function (extra) {
 		return extra.original

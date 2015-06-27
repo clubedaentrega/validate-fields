@@ -1,3 +1,6 @@
+# 3.2.1
+* Fixed: message for `number(min,max)`, `int(min,max)`, `uint(min,max)`
+
 # 3.2.0
 * Added: json type `'raw'` (like `'*'`, but don't call toJSON)
 
