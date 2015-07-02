@@ -1,3 +1,7 @@
+# 3.3.0
+* Added: `'base64'`
+* Fixed: `'hex'` does not accept an odd number of bytes
+
 # 3.2.1
 * Fixed: message for `number(min,max)`, `int(min,max)`, `uint(min,max)`
 

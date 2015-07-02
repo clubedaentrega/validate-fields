@@ -138,8 +138,19 @@ describe('basic types', function () {
 	it('should work for hex strings', function () {
 		validate('hex', 'babaca').should.be.true
 		validate('hex', 'babacx').should.be.false
+		validate('hex', 'babac').should.be.false
 		validate('hex(2)', 'ab').should.be.true
 		validate('hex(2)', 'abab').should.be.false
+		validate('hex(5)', 'babac').should.be.true
+	})
+
+	it('should work for base64 strings', function () {
+		validate('base64', 'AA==').should.be.true
+		validate('base64', 'AAA=').should.be.true
+		validate('base64', 'AAAA').should.be.true
+
+		validate('base64', 'AAA').should.be.false
+		validate('base64', '$').should.be.false
 	})
 
 	it('should work for set of strings', function () {

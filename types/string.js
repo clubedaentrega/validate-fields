@@ -67,7 +67,7 @@ module.exports = function (context) {
 	/**
 	 * A non-empty hex-encoded string
 	 * Examples:
-	 * 'hex': a non-empty hex string
+	 * 'hex': a non-empty hex string (with even number of hex-chars)
 	 * 'hex(12)': a hex-string with exactly 12 hex-chars (that is, 6 bytes)
 	 */
 	context.registerTaggedType({
@@ -80,10 +80,22 @@ module.exports = function (context) {
 			throw 'I was expecting a hex-encoded string'
 		} else if (args.length && value.length !== args[0]) {
 			throw 'I was expecting a string with ' + args[0] + ' hex-chars'
+		} else if (!args.length && value.length % 2) {
+			throw 'I was expecting an even number of hex-chars'
 		}
 	}, function (extra) {
 		return extra.original
 	})
+
+	/**
+	 * A base64 string, with valid padding
+	 */
+	context.registerType('base64', 'string', function (value) {
+		if (!value.match(/^[A-Za-z0-9+\/]+(=|==)?$/) ||
+			new Buffer(value, 'base64').toString('base64') !== value) {
+			throw 'I was expecting a base64-encoded string'
+		}
+	}, 'base64')
 
 	/**
 	 * A mongo objectId as a 24-hex-char string
