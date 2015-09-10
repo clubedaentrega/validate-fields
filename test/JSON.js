@@ -106,8 +106,8 @@ describe('JSON', function () {
 				called = true
 				return 'a string'
 			}
-		}).should.be.true
-		called.should.be.true
+		}).should.be.true()
+		called.should.be.true()
 	})
 
 	it('should not call toJSON on raw types', function () {
@@ -119,8 +119,8 @@ describe('JSON', function () {
 				called = true
 				return 'a string'
 			}
-		}).should.be.true
-		called.should.be.false
+		}).should.be.true()
+		called.should.be.false()
 
 		// raw is converted to '*'
 		check('my-type', '*')

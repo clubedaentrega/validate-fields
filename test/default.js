@@ -16,12 +16,12 @@ describe('default values', function () {
 				'default=12': Number
 			})
 
-		schema.validate(obj).should.be.true
+		schema.validate(obj).should.be.true()
 		obj.should.be.eql({
 			default: 12
 		})
 
-		schema.validate(obj2).should.be.true
+		schema.validate(obj2).should.be.true()
 		obj2.should.be.eql({
 			default: 12
 		})

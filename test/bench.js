@@ -57,7 +57,7 @@ describe('benchmark', function () {
 					email: 'user@email.com',
 					password: '0123456789abcdef0123456789abcdef'
 				}
-			}).should.be.true
+			}).should.be.true()
 		}
 	})
 })

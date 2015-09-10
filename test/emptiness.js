@@ -15,7 +15,7 @@ describe('emptiness', function () {
 	})
 
 	it('should consider missing field, undefined and null as empty', function () {
-		schema.validate({}).should.be.true
+		schema.validate({}).should.be.true()
 		schema.validate({
 			num: undefined,
 			str: undefined,
@@ -23,7 +23,7 @@ describe('emptiness', function () {
 			obj: undefined,
 			arr: undefined,
 			'*': undefined
-		}).should.be.true
+		}).should.be.true()
 		schema.validate({
 			num: null,
 			str: null,
@@ -31,16 +31,16 @@ describe('emptiness', function () {
 			obj: null,
 			arr: null,
 			'*': null
-		}).should.be.true
+		}).should.be.true()
 	})
 
 	it('should consider "" as empty only if the field is of type string', function () {
-		check('str').should.be.true
+		check('str').should.be.true()
 
-		check('num').should.be.false
-		check('bool').should.be.false
-		check('obj').should.be.false
-		check('arr').should.be.false
+		check('num').should.be.false()
+		check('bool').should.be.false()
+		check('obj').should.be.false()
+		check('arr').should.be.false()
 
 		function check(key) {
 			var obj = {}
@@ -50,12 +50,12 @@ describe('emptiness', function () {
 	})
 
 	it('should consider [] as valid but not empty if the field is of type array', function () {
-		check('arr').should.be.true
+		check('arr').should.be.true()
 
-		check('str').should.be.false
-		check('num').should.be.false
-		check('bool').should.be.false
-		check('obj').should.be.false
+		check('str').should.be.false()
+		check('num').should.be.false()
+		check('bool').should.be.false()
+		check('obj').should.be.false()
 
 		function check(key) {
 			var obj = {}

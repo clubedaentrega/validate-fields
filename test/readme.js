@@ -15,13 +15,13 @@ describe('readme examples', function () {
 				age: 27
 			}
 
-		validate(schema, value).should.be.true
+		validate(schema, value).should.be.true()
 	})
 
 	it('should work for the pre-parsing example', function () {
 		var schema = validate.parse([String])
 
-		schema.validate(['a', 'b']).should.be.true
+		schema.validate(['a', 'b']).should.be.true()
 	})
 
 	it('should work for escaping example', function () {
@@ -45,7 +45,7 @@ describe('readme examples', function () {
 			a: 2
 		}, {
 			strict: true
-		}).should.be.false
+		}).should.be.false()
 	})
 
 	it('should work for the hash map example', function () {
@@ -56,7 +56,7 @@ describe('readme examples', function () {
 		validate({
 			'a?': String,
 			'b?': 'int'
-		}, obj).should.be.true
+		}, obj).should.be.true()
 		obj.should.be.eql({})
 	})
 
@@ -69,9 +69,9 @@ describe('readme examples', function () {
 
 		validate('name', {
 			last: 'Souza'
-		}).should.be.false
+		}).should.be.false()
 		validate.lastError.should.be.equal('I was expecting a value in first')
-		validate(['zip-code'], ['12345', '12345-1234']).should.be.true
+		validate(['zip-code'], ['12345', '12345-1234']).should.be.true()
 	})
 
 	it('should work for the simple custom type example', function () {
@@ -86,7 +86,7 @@ describe('readme examples', function () {
 		}
 		validate({
 			n: 'divBy3'
-		}, obj).should.be.true
+		}, obj).should.be.true()
 		obj.n.should.be.equal(4)
 	})
 
@@ -105,8 +105,8 @@ describe('readme examples', function () {
 			}
 			return value / n
 		})
-		validate('divBy(17)', 35).should.be.false
-		validate('divBy(35)', 35).should.be.true
+		validate('divBy(17)', 35).should.be.false()
+		validate('divBy(35)', 35).should.be.true()
 	})
 
 	it('should work for serialization examples', function () {
@@ -134,6 +134,6 @@ describe('readme examples', function () {
 		fields3.validate({
 			name: 'John',
 			age: 12
-		}).should.be.true
+		}).should.be.true()
 	})
 })
