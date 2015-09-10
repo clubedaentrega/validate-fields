@@ -47,8 +47,18 @@ Type.prototype.validate = function (value, path, extra, options) {
 		value = value.toJSON()
 	}
 
-	var type = Array.isArray(value) ? 'array' : (value === null ? 'null' : typeof value),
-		ret
+	var type, ret
+	if (Array.isArray(value)) {
+		type = 'array'
+	} else if (value === null) {
+		type = 'null'
+	} else if (Number.isNaN(value)) {
+		type = 'NaN'
+	} else if (value === Infinity || value === -Infinity) {
+		type = 'infinity'
+	} else {
+		type = typeof value
+	}
 	if (this.jsonType !== '*' &&
 		this.jsonType !== 'raw' &&
 		this.jsonType !== type) {

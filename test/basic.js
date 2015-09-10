@@ -100,6 +100,18 @@ describe('basic types', function () {
 		fields.lastError.should.be.equal('I was expecting a value in aString')
 	})
 
+	it('should not accept NaN, Infinity and -Infinity', function () {
+		fields.validate({
+			aNumber: NaN
+		}).should.be.false()
+		fields.validate({
+			aNumber: Infinity
+		}).should.be.false()
+		fields.validate({
+			aNumber: -Infinity
+		}).should.be.false()
+	})
+
 	it('should not accept an empty string', function () {
 		fields.validate({
 			aNumber: 0,

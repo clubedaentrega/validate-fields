@@ -1,3 +1,6 @@
+# 3.3.1
+* Fixed: NaN, Infinity and -Infinity being accepted as numbers [issue #11](https://github.com/clubedaentrega/validate-fields/issues/11)
+
 # 3.3.0
 * Added: `'base64'`
 * Fixed: `'hex'` does not accept an odd number of bytes
