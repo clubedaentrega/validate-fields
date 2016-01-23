@@ -122,10 +122,14 @@ Example: `{books: [{title: String, author: String}]}`
 * `'number(-3.5,10)'`: a number `x` with `-3.5 <= x <= 10`
 * `'number(-3.5,)'`: a number `x` with `-3.5 <= x`
 * `'number(,10)'`: a number `x` with `x <= 10`
+* `'numeric'`: a double value encoded in a string
+* `'numeric(<...>)'`: like `'number(<...>)'`, but for numeric strings
 * `'int'`: an integer between -2^51 and 2^51 (safe integer)
 * `'int(-3,10)'`: an integer between -3 and 10. Lower and upper bounds are optional
+* `'numericInt'`: like `'int'`, but for numeric strings
 * `'uint'`: a natural number less than 2^51
 * `'uint(3,10)'`: a natural number between 3 and 10. Lower and upper bounds are optional
+* `'numericUint'`: like `'int'`, but for numeric strings
 * `'string(17)'`: a string with exactly 17 chars
 * `'string(,100)'`: at most 100 chars
 * `'string(8,)'`: at least 8 chars
@@ -137,6 +141,7 @@ Example: `{books: [{title: String, author: String}]}`
 * `'email'`: a string that looks like an email address
 * `'in(cat, dog, cow)'`: a string in the given set of strings
 * `'numberIn(3, 1.4, -15)'`: a number in the given set of values
+* `'numericIn(<...>)'`: like `'numberIn(<...>)'`, but for numeric strings
 * `/my-own-regex/`: a string that matches the custom regexp
 
 ## Custom types

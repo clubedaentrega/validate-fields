@@ -1,3 +1,6 @@
+# 3.4.0
+* Added: `'numeric'`, `'numericInt'`, `'numericUint'` and `'numericIn'` core types. Those are string equivalents of `Number`, `'int'`, `'uint'`, `'numberIn'` types
+
 # 3.3.1
 * Fixed: NaN, Infinity and -Infinity being accepted as numbers [issue #11](https://github.com/clubedaentrega/validate-fields/issues/11)
 
