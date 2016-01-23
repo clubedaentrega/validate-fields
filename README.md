@@ -1,4 +1,7 @@
 # Validate Fields
+[![Build Status](https://travis-ci.org/clubedaentrega/validate-fields.svg?branch=master)](https://travis-ci.org/clubedaentrega/validate-fields)
+[![Inline docs](http://inch-ci.org/github/clubedaentrega/validate-fields.svg?branch=master)](http://inch-ci.org/github/clubedaentrega/validate-fields)
+[![Dependency Status](https://david-dm.org/clubedaentrega/validate-fields.svg)](https://david-dm.org/clubedaentrega/validate-fields)
 
 A simple yet powerful JSON schema validator
 
