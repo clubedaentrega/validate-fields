@@ -10,7 +10,7 @@ describe('benchmark', function () {
 
 	it('should parse fast', function () {
 		var i
-		this.timeout(50)
+		this.timeout(50) // 50us
 		for (i = 0; i < 1e3; i++) {
 			parsed = validate.parse({
 				store: {
@@ -35,7 +35,7 @@ describe('benchmark', function () {
 
 	it('should validate fast', function () {
 		var i
-		this.timeout(50)
+		this.timeout(100) // 100us
 		for (i = 0; i < 1e3; i++) {
 			parsed.validate({
 				store: {
