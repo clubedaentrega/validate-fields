@@ -5,7 +5,7 @@ require('should')
 
 var validate = require('../')()
 
-describe('benchmark', function () {
+describe.skip('benchmark', function () {
 	var parsed
 
 	it('should parse fast', function () {
