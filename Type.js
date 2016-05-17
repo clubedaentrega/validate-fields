@@ -78,9 +78,6 @@ Type.prototype.isEmpty = function (value) {
 		(this.jsonType === 'string' && value === '')
 }
 
-// Lazy loaded require('./index').parse
-var parse
-
 /**
  * Function called when stringifying a Field instance
  * Only core types can be precisely stringified
@@ -92,9 +89,6 @@ Type.prototype.convertToJSON = function (extra) {
 	if (this._toJSON) {
 		return typeof this._toJSON === 'function' ? this._toJSON(extra) : this._toJSON
 	}
-
-	// Lazy loading
-	parse = parse || require('./index').parse
 
 	// Aproximated convertion
 	return {
