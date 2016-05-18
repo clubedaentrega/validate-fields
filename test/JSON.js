@@ -75,7 +75,12 @@ describe('JSON', function () {
 			'gender?': 'in(M, F)'
 		})
 
-		check('user')
+		check('user', {
+			name: String,
+			age: 'uint',
+			birth: Date,
+			'gender?': 'in(M, F)'
+		})
 	})
 
 	it('should turn custom types into more general types', function () {
