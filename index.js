@@ -96,6 +96,7 @@ module.exports = function () {
 		if (name in simpleTypes || name in typedefs) {
 			throw new Error('Type ' + name + ' already registered')
 		}
+		definition.typedefName = name
 		typedefs[name] = definition
 	}
 
@@ -123,14 +124,22 @@ module.exports = function () {
 	 */
 
 	/**
+	 * @callback toJSONSchemaCallback
+	 * @param {*} extra
+	 * @param {boolean} expandTypedefs
+	 * @returns {Object}
+	 */
+
+	/**
 	 * Register a new type
 	 * @param {(string|Object|RegExp|parseCallback)} definition
 	 * @param {string} jsonType One of: number, string, boolean, object, array, *, raw
 	 * @param {checkCallback} [checkFn=function(){}]
 	 * @param {toJSONCallback|string} [toJSON] - Used only by core types
+	 * @param {toJSONSchemaCallback} [toJSONSchema] - Used only by core types
 	 */
-	context.registerType = function (definition, jsonType, checkFn, toJSON) {
-		var type = new Type(jsonType, checkFn || function () {}, toJSON)
+	context.registerType = function (definition, jsonType, checkFn, toJSON, toJSONSchema) {
+		var type = new Type(jsonType, checkFn || function () {}, toJSON, toJSONSchema)
 		if (typeof definition === 'string') {
 			// Simple definition: match a single string
 			if (definition in simpleTypes || definition in typedefs) {
@@ -179,8 +188,9 @@ module.exports = function () {
 	 * @parma {boolean} [definition.numeric=false] true will parse all args as numbers
 	 * @param {checkCallback} [checkFn=function(){}]
 	 * @param {toJSONCallback|string} [toJSON] - Used only by core types
+	 * @param {toJSONSchemaCallback} [toJSONSchema] - Used only by core types
 	 */
-	context.registerTaggedType = function (definition, checkFn, toJSON) {
+	context.registerTaggedType = function (definition, checkFn, toJSON, toJSONSchema) {
 		if (!definition || typeof definition !== 'object') {
 			throw new Error('Invalid definition (' + definition + '), it must be an object')
 		} else if (!definition.tag || !definition.jsonType) {
@@ -188,7 +198,7 @@ module.exports = function () {
 		}
 
 		var tag = definition.tag,
-			type = new Type(definition.jsonType, checkFn || function () {}, toJSON)
+			type = new Type(definition.jsonType, checkFn || function () {}, toJSON, toJSONSchema)
 
 		if (tag in taggedTypes) {
 			throw new Error('Tag ' + tag + ' already registered')

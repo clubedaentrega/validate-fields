@@ -5,8 +5,9 @@
  * @param {string} jsonType
  * @param {checkCallback} checkFn
  * @param {toJSONCallback|string} [toJSON]
+ * @param {toJSONSchemaCallback} [toJSONSchema]
  */
-function Type(jsonType, checkFn, toJSON) {
+function Type(jsonType, checkFn, toJSON, toJSONSchema) {
 	var types = ['number', 'string', 'boolean', 'object', 'array', '*', 'raw']
 
 	if (typeof jsonType !== 'string') {
@@ -25,6 +26,9 @@ function Type(jsonType, checkFn, toJSON) {
 
 	/** @member {?(toJSONCallback|string)} */
 	this._toJSON = toJSON
+
+	/** @member {?toJSONSchemaCallback} */
+	this._toJSONSchema = toJSONSchema
 }
 
 module.exports = Type
@@ -100,4 +104,35 @@ Type.prototype.convertToJSON = function (extra) {
 		'*': '*',
 		raw: '*'
 	}[this.jsonType]
+}
+
+/**
+ * Function called when coverting to JSON Schema
+ * Only core types can be precisely defined
+ * Custom types are represented by their parent JSON-type
+ * @param {*} extra
+ * @param {boolean} expandTypedefs
+ * @returns {Object}
+ */
+Type.prototype.convertToJSONSchema = function (extra, expandTypedefs) {
+	if (this._toJSONSchema) {
+		return this._toJSONSchema(extra, expandTypedefs)
+	}
+
+	// Aproximated convertion
+	var jsonSchemaType = {
+		number: 'number',
+		string: 'string',
+		boolean: 'boolean',
+		object: 'object',
+		array: 'array'
+	}[this.jsonType]
+
+	if (!jsonSchemaType) {
+		throw new Error('This type cannot be converted to JSON Schema')
+	}
+
+	return {
+		type: jsonSchemaType
+	}
 }

@@ -14,6 +14,9 @@ function Field(type, extra) {
 
 	/** @member {string} */
 	this.lastError = ''
+
+	/** @member {?string} */
+	this.typedefName = null
 }
 
 module.exports = Field
@@ -72,4 +75,20 @@ Field.prototype._validate = function (value, path, options) {
  */
 Field.prototype.toJSON = function () {
 	return this.type.convertToJSON(this.extra)
+}
+
+/**
+ * Function called when coverting to JSON Schema
+ * Only core types can be precisely stringified
+ * Custom types are represented by their parent JSON-type
+ * @param {boolean} [expandTypedefs=false] - if false, typedefs are returned as references
+ * @returns {Object}
+ */
+Field.prototype.toJSONSchema = function (expandTypedefs) {
+	if (this.typedefName && !expandTypedefs) {
+		return {
+			$ref: '#/definitions/' + this.typedefName
+		}
+	}
+	return this.type.convertToJSONSchema(this.extra, Boolean(expandTypedefs))
 }
