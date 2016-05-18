@@ -111,6 +111,31 @@ module.exports = function (context) {
 		}
 
 		return ret
+	}, function (extra, expandTypedefs) {
+		var ret = {
+				type: 'object',
+				properties: {},
+				required: []
+			},
+			key, info
+
+		for (key in extra.required) {
+			ret.properties[key] = extra.required[key].toJSONSchema(expandTypedefs)
+			ret.required.push(key)
+		}
+		for (key in extra.optional) {
+			info = extra.optional[key]
+			ret.properties[key] = info.field.toJSONSchema(expandTypedefs)
+			if (info.defaultSource !== undefined) {
+				ret.properties[key].default = JSON.parse(info.defaultSource)
+			}
+		}
+
+		if (!ret.required.length) {
+			delete ret.required
+		}
+
+		return ret
 	})
 }
 

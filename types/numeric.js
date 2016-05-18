@@ -5,14 +5,23 @@ module.exports = function (context) {
 	 * A number (double)
 	 * Example: {name: String, value: Number}
 	 */
-	context.registerType(Number, 'number', null, '$Number')
+	context.registerType(Number, 'number', null, '$Number', function () {
+		return {
+			type: 'number'
+		}
+	})
 
 	/**
 	 * A double value encoded in a string
 	 */
 	context.registerType('numeric', 'string', function (value) {
 		return toNumber(value)
-	}, 'numeric')
+	}, 'numeric', function () {
+		return {
+			type: 'string',
+			format: 'numeric'
+		}
+	})
 
 	/**
 	 * A number range
@@ -30,6 +39,8 @@ module.exports = function (context) {
 		} else if (args[1] !== undefined && value > args[1]) {
 			throw 'I was expecting a value less than ' + args[1]
 		}
+	}, function (args) {
+		return buildSchema('number', args[0], args[1])
 	})
 
 	/**
@@ -39,6 +50,8 @@ module.exports = function (context) {
 		if (!isSafeInt(value)) {
 			throw 'I was expecting an integer'
 		}
+	}, function () {
+		return buildSchema('integer')
 	})
 
 	/**
@@ -61,6 +74,8 @@ module.exports = function (context) {
 		} else if (args[1] !== undefined && value > args[1]) {
 			throw 'I was expecting a value less than ' + args[1]
 		}
+	}, function (args) {
+		return buildSchema('integer', args[0], args[1])
 	})
 
 	/**
@@ -70,6 +85,8 @@ module.exports = function (context) {
 		if (!isSafeInt(value) || value < 0) {
 			throw 'I was expecting a natural number'
 		}
+	}, function () {
+		return buildSchema('integer', 0)
 	})
 
 	/**
@@ -92,6 +109,8 @@ module.exports = function (context) {
 		} else if (args[1] !== undefined && value > args[1]) {
 			throw 'I was expecting a value less than ' + args[1]
 		}
+	}, function (args) {
+		return buildSchema('integer', Math.max(args[0] || 0, 0), args[1])
 	})
 
 	/**
@@ -106,7 +125,12 @@ module.exports = function (context) {
 		if (args.indexOf(value) === -1) {
 			throw 'I was expecting one of [' + args.join(', ') + ']'
 		}
-	}, returnOriginal)
+	}, returnOriginal, function (args) {
+		return {
+			type: 'number',
+			enum: args
+		}
+	})
 	context.registerTaggedType({
 		tag: 'numericIn',
 		jsonType: 'string',
@@ -117,23 +141,38 @@ module.exports = function (context) {
 			throw 'I was expecting one of [' + args.join(', ') + ']'
 		}
 		return numberValue
-	}, returnOriginal)
+	}, returnOriginal, function (args) {
+		return {
+			type: 'number',
+			enum: args.map(function (arg) {
+				return String(arg)
+			})
+		}
+	})
 
 	/**
 	 * Register number and numeric dual basic types
 	 * @param {string} numberType
 	 * @param {string} numericType
 	 * @param {Function} checkFn
+	 * @param {function(string, *):Object} toJSONSchema
 	 * @private
 	 */
-	function registerDual(numberType, numericType, checkFn) {
-		context.registerType(numberType, 'number', checkFn, numberType)
+	function registerDual(numberType, numericType, checkFn, toJSONSchema) {
+		context.registerType(numberType, 'number', checkFn, numberType, function (extra) {
+			return toJSONSchema('number', extra)
+		})
 
 		context.registerType(numericType, 'string', function (value) {
 			var numberValue = toNumber(value)
 			checkFn(numberValue)
 			return numberValue
-		}, numericType)
+		}, numericType, function () {
+			return {
+				type: 'string',
+				format: numericType
+			}
+		})
 	}
 
 	/**
@@ -141,9 +180,10 @@ module.exports = function (context) {
 	 * @param {string} numberTag
 	 * @param {string} numericTag
 	 * @param {Function} checkFn
+	 * @param {function(*):Object} toJSONSchema
 	 * @private
 	 */
-	function registerTaggedDual(numberTag, numericTag, checkFn) {
+	function registerTaggedDual(numberTag, numericTag, checkFn, toJSONSchema) {
 		context.registerTaggedType({
 			tag: numberTag,
 			jsonType: 'number',
@@ -151,7 +191,7 @@ module.exports = function (context) {
 			maxArgs: 2,
 			sparse: true,
 			numeric: true
-		}, checkFn, returnOriginal)
+		}, checkFn, returnOriginal, toJSONSchema)
 
 		context.registerTaggedType({
 			tag: numericTag,
@@ -164,7 +204,12 @@ module.exports = function (context) {
 			var numberValue = toNumber(value)
 			checkFn(numberValue, args)
 			return numberValue
-		}, returnOriginal)
+		}, returnOriginal, function (extra) {
+			return {
+				type: 'string',
+				format: extra.original
+			}
+		})
 	}
 
 	/**
@@ -205,4 +250,24 @@ function toNumber(value) {
 		throw 'I was expecting number and you gave me ' + type
 	}
 	return numberValue
+}
+
+/**
+ * @param {string} type
+ * @param {number} [min]
+ * @param {number} [max]
+ */
+function buildSchema(type, min, max) {
+	var ret = {
+		type: type
+	}
+
+	if (min !== undefined) {
+		ret.minimum = min
+	}
+	if (max !== undefined) {
+		ret.maximum = max
+	}
+
+	return ret
 }

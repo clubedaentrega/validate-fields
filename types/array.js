@@ -22,5 +22,10 @@ module.exports = function (context) {
 		return value
 	}, function (extra) {
 		return [extra.toJSON()]
+	}, function (extra, expandTypedefs) {
+		return {
+			type: 'array',
+			items: extra.toJSONSchema(expandTypedefs)
+		}
 	})
 }

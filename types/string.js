@@ -22,7 +22,12 @@ module.exports = function (context) {
 		}
 
 		return date
-	}, '$Date')
+	}, '$Date', function () {
+		return {
+			type: 'string',
+			format: 'date-time'
+		}
+	})
 
 	/**
 	 * A non-empty string with limited length
@@ -62,6 +67,11 @@ module.exports = function (context) {
 		return value
 	}, function (extra) {
 		return extra.original
+	}, function (args) {
+		if (args.length === 1) {
+			return buildSchema(undefined, args[0], args[0])
+		}
+		return buildSchema(undefined, args[0], args[1])
 	})
 
 	/**
@@ -85,6 +95,8 @@ module.exports = function (context) {
 		}
 	}, function (extra) {
 		return extra.original
+	}, function (args) {
+		return buildSchema('hex', args[0], args[0])
 	})
 
 	/**
@@ -95,7 +107,9 @@ module.exports = function (context) {
 			new Buffer(value, 'base64').toString('base64') !== value) {
 			throw 'I was expecting a base64-encoded string'
 		}
-	}, 'base64')
+	}, 'base64', function () {
+		return buildSchema('byte')
+	})
 
 	/**
 	 * A mongo objectId as a 24-hex-char string
@@ -104,7 +118,9 @@ module.exports = function (context) {
 		if (!value.match(/^[0-9a-fA-F]{24}$/)) {
 			throw 'I was expecting a mongo objectId'
 		}
-	}, 'id')
+	}, 'id', function () {
+		return buildSchema('id')
+	})
 
 	/**
 	 * An email
@@ -118,7 +134,9 @@ module.exports = function (context) {
 		if (!value.match(/^[^@]+@.+\.[^.]+$/i)) {
 			throw 'I was expecting an email address'
 		}
-	}, 'email')
+	}, 'email', function () {
+		return buildSchema('email')
+	})
 
 	/**
 	 * A string from the given set
@@ -133,6 +151,11 @@ module.exports = function (context) {
 		}
 	}, function (extra) {
 		return extra.original
+	}, function (args) {
+		return {
+			type: 'string',
+			enum: args.slice()
+		}
 	})
 }
 
@@ -146,4 +169,27 @@ function escape(str) {
 		.replace(/>/g, '&gt;')
 		.replace(/'/g, '&#39;')
 		.replace(/"/g, '&quot;')
+}
+
+/**
+ * @param {string} [pattern]
+ * @param {number} [min]
+ * @param {number} [max]
+ */
+function buildSchema(format, min, max) {
+	var ret = {
+		type: 'string'
+	}
+
+	if (format !== undefined) {
+		ret.format = format
+	}
+	if (min !== undefined) {
+		ret.minLength = min
+	}
+	if (max !== undefined) {
+		ret.maxLength = max
+	}
+
+	return ret
 }

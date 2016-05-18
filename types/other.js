@@ -38,9 +38,30 @@ module.exports = function (context) {
 			throw 'I was expecting a string that matches ' + extra
 		}
 	}, function (extra) {
-		var flags = (extra.global ? 'g' : '') +
-			(extra.ignoreCase ? 'i' : '') +
-			(extra.multiline ? 'm' : '')
-		return '$RegExp:' + flags + ':' + extra.source
+		return '$RegExp:' + prepareFlags(extra) + ':' + extra.source
+	}, function (extra) {
+		var flags = prepareFlags(extra),
+			ret = {
+				type: 'string',
+				pattern: extra.source
+			}
+
+		if (flags) {
+			ret['x-flags'] = flags
+		}
+
+		return ret
 	})
+}
+
+/**
+ * @param {RegExp} regex
+ * @returns {string}
+ */
+function prepareFlags(regex) {
+	return (regex.global ? 'g' : '') +
+		(regex.ignoreCase ? 'i' : '') +
+		(regex.multiline ? 'm' : '') +
+		(regex.unicode ? 'u' : '') +
+		(regex.sticky ? 'y' : '')
 }
