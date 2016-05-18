@@ -223,3 +223,27 @@ var fields = validate.parse(definition)
 
 fields.validate({name: 'John', age: 12}) // true
 ```
+
+## JSON Schema
+A parsed `Field` can be exported as [JSON Schema](http://json-schema.org/):
+```javascript
+var fields = validate.parse({name: String, age: 'uint', 'birth?': Date})
+fields.toJSONSchema()
+/* {
+	type: 'object',
+	properties: {
+		name: {
+			type: 'string'
+		},
+		age: {
+			type: 'integer',
+			minimum: 0
+		},
+		birth: {
+			type: 'string',
+			format: 'date-time'
+		}
+	},
+	required: ['name', 'age']
+} */
+```

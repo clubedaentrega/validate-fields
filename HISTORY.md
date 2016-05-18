@@ -1,3 +1,6 @@
+# 3.5.0
+* Added: `Field#toJSONSchema()` that returns a parsed schema encoded in the [JSON Schema](http://json-schema.org/) standard
+
 # 3.4.0
 * Added: `'numeric'`, `'numericInt'`, `'numericUint'` and `'numericIn'` core types. Those are string equivalents of `Number`, `'int'`, `'uint'`, `'numberIn'` types
 
