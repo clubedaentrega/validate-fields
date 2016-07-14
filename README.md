@@ -136,7 +136,7 @@ Example: `{books: [{title: String, author: String}]}`
 * `'string(8,100)'`: at most 100, at least 8
 * `'hex'`: a hex string (even number of hex-chars)
 * `'hex(12)'`: a hex-string with exactly 12 hex-chars (that is, 6 bytes)
-* `base64`: a base64 string, with valid padding
+* `'base64'`: a base64 string, with valid padding
 * `'id'`: a mongo objectId as a 24-hex-char string
 * `'email'`: a string that looks like an email address
 * `'in(cat, dog, cow)'`: a string in the given set of strings
