@@ -1,3 +1,6 @@
+# 3.6.0
+* Added: `context.registerObjectType` to be used by core types in order to support IE
+
 # 3.5.1
 * Fixed: use isNaN instead of Number.isNaN to support IE
 

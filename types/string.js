@@ -6,7 +6,7 @@ module.exports = function (context) {
 	 * Example: {name: {first: String, 'last?': String}}
 	 * The string will be HTML escaped if options.escape is true
 	 */
-	context.registerType(String, 'string', function (value, _, options) {
+	context.registerObjectType(String, 'string', function (value, _, options) {
 		return options.escape ? escape(value) : value
 	}, '$String')
 
@@ -15,7 +15,7 @@ module.exports = function (context) {
 	 * It will convert the string into a date object
 	 * It accepts all formats defined by the Date(str) constructor, but the a ISO string is recommended
 	 */
-	context.registerType(Date, 'string', function (value) {
+	context.registerObjectType(Date, 'string', function (value) {
 		var date = new Date(value)
 		if (isNaN(date.getTime())) {
 			throw 'I was expecting a date string'

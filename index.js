@@ -178,6 +178,23 @@ module.exports = function () {
 	}
 
 	/**
+	 * Register a new type with an Object, used to register with constructors
+	 * @param {Object} definition
+	 * @param {string} jsonType One of: number, string, boolean, object, array, *, raw
+	 * @param {checkCallback} [checkFn=function(){}]
+	 * @param {toJSONCallback|string} [toJSON] - Used only by core types
+	 * @param {toJSONSchemaCallback} [toJSONSchema] - Used only by core types
+	 */
+	context.registerObjectType = function (definition, jsonType, checkFn, toJSON, toJSONSchema) {
+		var type = new Type(jsonType, checkFn || function () {}, toJSON, toJSONSchema)
+		if (objectTypes.objects.indexOf(definition) !== -1) {
+			throw new Error('Type ' + definition + ' already registered')
+		}
+		objectTypes.objects.push(definition)
+		objectTypes.types.push(type)
+	}
+
+	/**
 	 * Register a new tagged type
 	 * @param {Object} definition
 	 * @param {string} definition.tag

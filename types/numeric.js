@@ -5,7 +5,7 @@ module.exports = function (context) {
 	 * A number (double)
 	 * Example: {name: String, value: Number}
 	 */
-	context.registerType(Number, 'number', null, '$Number', function () {
+	context.registerObjectType(Number, 'number', null, '$Number', function () {
 		return {
 			type: 'number'
 		}

@@ -5,7 +5,7 @@ module.exports = function (context) {
 	 * A non-null generic object. No property is validated inside the object
 	 * Example: {date: Date, event: Object}
 	 */
-	context.registerType(Object, 'object', function (value) {
+	context.registerObjectType(Object, 'object', function (value) {
 		if (value === null) {
 			throw 'I was expecting a non-null object'
 		}
@@ -15,10 +15,10 @@ module.exports = function (context) {
 	 * A non-empty generic array. No element is validated inside the array
 	 * Example: {arrayOfThings: Array}
 	 */
-	context.registerType(Array, 'array', null, '$Array')
+	context.registerObjectType(Array, 'array', null, '$Array')
 
 	/** A bool value */
-	context.registerType(Boolean, 'boolean', null, '$Boolean')
+	context.registerObjectType(Boolean, 'boolean', null, '$Boolean')
 
 	/**
 	 * Any type
