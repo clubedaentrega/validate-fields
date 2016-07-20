@@ -1,3 +1,6 @@
+# 3.6.1
+* Fixed: use isFinite instead of Number.isFinite to support IE
+
 # 3.6.0
 * Added: `context.registerObjectType` to be used by core types in order to support IE
 

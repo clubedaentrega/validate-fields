@@ -225,7 +225,7 @@ module.exports = function (context) {
  * @returns {boolean}
  */
 function isSafeInt(value) {
-	return Number.isFinite(value) &&
+	return isFinite(value) &&
 		value > -9007199254740992 &&
 		value < 9007199254740992 &&
 		Math.round(value) === value
