@@ -56,7 +56,7 @@ Type.prototype.validate = function (value, path, extra, options) {
 		type = 'array'
 	} else if (value === null) {
 		type = 'null'
-	} else if (Number.isNaN(value)) {
+	} else if (typeof value === 'number' && isNaN(value)) {
 		type = 'NaN'
 	} else if (value === Infinity || value === -Infinity) {
 		type = 'infinity'

@@ -1,3 +1,6 @@
+# 3.5.1
+* Fixed: use isNaN instead of Number.isNaN to support IE
+
 # 3.5.0
 * Added: `Field#toJSONSchema()` that returns a parsed schema encoded in the [JSON Schema](http://json-schema.org/) standard
 

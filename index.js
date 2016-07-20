@@ -282,7 +282,7 @@ function parseTagged(definition, taggedTypes) {
 
 		if (typeInfo.numeric) {
 			arg = Number(arg)
-			if (Number.isNaN(arg)) {
+			if (isNaN(arg)) {
 				throw new Error('Invalid numeric argument at position ' + i + ' for tagged type ' + tag)
 			}
 		}

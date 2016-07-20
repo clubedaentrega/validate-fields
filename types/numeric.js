@@ -239,7 +239,7 @@ function isSafeInt(value) {
 function toNumber(value) {
 	var numberValue = Number(value),
 		type
-	if (Number.isNaN(numberValue)) {
+	if (isNaN(numberValue)) {
 		type = 'NaN'
 	} else if (numberValue === Infinity || numberValue === -Infinity) {
 		type = 'infinity'

@@ -17,7 +17,7 @@ module.exports = function (context) {
 	 */
 	context.registerType(Date, 'string', function (value) {
 		var date = new Date(value)
-		if (Number.isNaN(date.getTime())) {
+		if (isNaN(date.getTime())) {
 			throw 'I was expecting a date string'
 		}
 
