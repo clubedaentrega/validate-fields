@@ -1,3 +1,6 @@
+# 3.7.0
+* Added: `parseArgs` callback for `registerTaggedType`, called to pre-process tag arguments into extra
+
 # 3.6.1
 * Fixed: use isFinite instead of Number.isFinite to support IE
 

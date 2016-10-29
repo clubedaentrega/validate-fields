@@ -108,6 +108,12 @@ module.exports = function () {
 	 */
 
 	/**
+	 * @callback parseTaggedArgsCallback
+	 * @param {Array<string|number|undefined>} args the parsed arguments
+	 * @returns {*} will be sent to checkCallback afterwards as extra
+	 */
+
+	/**
 	 * @callback checkCallback
 	 * @param {*} value the value to check
 	 * @param {*} extra the result of String.prototype.match if the type is defined with a regexp or the parseCallback result if defined with a function
@@ -202,7 +208,8 @@ module.exports = function () {
 	 * @parma {number} [definition.minArgs=0]
 	 * @parma {number} [definition.maxArgs=0] Zero means no limit
 	 * @parma {boolean} [definition.sparse=false] true let some args to be skipped: 'tag(,2,,4)'
-	 * @parma {boolean} [definition.numeric=false] true will parse all args as numbers
+	 * @param {boolean} [definition.numeric=false] true will parse all args as numbers
+	 * @param {?parseTaggedArgsCallback} [definition.parseArgs=null] process arguments
 	 * @param {checkCallback} [checkFn=function(){}]
 	 * @param {toJSONCallback|string} [toJSON] - Used only by core types
 	 * @param {toJSONSchemaCallback} [toJSONSchema] - Used only by core types
@@ -226,7 +233,8 @@ module.exports = function () {
 			minArgs: definition.minArgs || 0,
 			maxArgs: definition.maxArgs || 0,
 			sparse: Boolean(definition.sparse),
-			numeric: Boolean(definition.numeric)
+			numeric: Boolean(definition.numeric),
+			parseArgs: definition.parseArgs
 		}
 	}
 
@@ -236,7 +244,7 @@ module.exports = function () {
 	 * The two main types are:
 	 * * Hash map: callbackTypes.fns[0], callbackTypes.types[0]
 	 * * Array: callbackTypes.fns[1], callbackTypes.types[1]
-	 * @returns {{simpleTypes: Object.<string, Type>, typedefs: Field, objectTypes: {objects: Object[], types: Type[]}, callbackTypes: {fns: Function[], types: Type[]}}, taggedTypes: Object<string, {type: string, minArgs: number, maxArgs: number, sparse: boolean, numeric: boolean}>}
+	 * @returns {{simpleTypes: Object.<string, Type>, typedefs: Field, objectTypes: {objects: Object[], types: Type[]}, callbackTypes: {fns: Function[], types: Type[]}}, taggedTypes: Object<string, {type: string, minArgs: number, maxArgs: number, sparse: boolean, numeric: boolean, parseArgs: ?parseTaggedArgsCallback}>}
 	 */
 	context.getRegisteredTypes = function () {
 		return {
@@ -310,10 +318,10 @@ function parseTagged(definition, taggedTypes) {
 	if (args.length < typeInfo.minArgs) {
 		throw new Error('Too few arguments for tagged type ' + tag)
 	} else if (typeInfo.maxArgs && args.length > typeInfo.maxArgs) {
-		throw new Error('Too much arguments for tagged type ' + tag)
+		throw new Error('Too many arguments for tagged type ' + tag)
 	}
 
-	return new Field(typeInfo.type, args)
+	return new Field(typeInfo.type, typeInfo.parseArgs ? typeInfo.parseArgs(args) : args)
 }
 
 var JSONMap = {
