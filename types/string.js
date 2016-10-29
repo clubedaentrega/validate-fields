@@ -1,5 +1,7 @@
 'use strict'
 
+var base64Regex = /^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/][AQgw]==|[A-Za-z0-9+\/]{2}[AEIMQUYcgkosw048]=)?$/
+
 module.exports = function (context) {
 	/**
 	 * A non-empty string (unless in a hash map, marked as optional)
@@ -103,8 +105,7 @@ module.exports = function (context) {
 	 * A base64 string, with valid padding
 	 */
 	context.registerType('base64', 'string', function (value) {
-		if (!value.match(/^[A-Za-z0-9+\/]+(=|==)?$/) ||
-			new Buffer(value, 'base64').toString('base64') !== value) {
+		if (!base64Regex.test(value)) {
 			throw 'I was expecting a base64-encoded string'
 		}
 	}, 'base64', function () {

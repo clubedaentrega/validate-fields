@@ -1,3 +1,6 @@
+# 3.7.1
+* Changed: do not depend on Buffer to check base64 string
+
 # 3.7.0
 * Added: `parseArgs` callback for `registerTaggedType`, called to pre-process tag arguments into extra
 
