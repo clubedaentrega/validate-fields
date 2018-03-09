@@ -20,7 +20,7 @@
 		"eqeqeq": "error",
 		"no-implicit-coercion": "error",
 		"no-self-compare": "error",
-		"no-throw-literal": "error",
+		"no-throw-literal": "off",
 		"no-useless-return": "error",
 		"dot-location": ["error", "property"],
 		"no-use-before-define": ["error", {

@@ -28,7 +28,7 @@ describe('default values', () => {
 	})
 
 	it('should check JSON syntax at parse time', () => {
-		let boom = function () {
+		function boom() {
 			validate.parse({
 				'a=invalid JSON': Number
 			})
@@ -37,7 +37,7 @@ describe('default values', () => {
 	})
 
 	it('should validate default value at parse time', () => {
-		let boom = function () {
+		function boom() {
 			validate.parse({
 				'a="not a number"': Number
 			})

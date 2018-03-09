@@ -33,7 +33,7 @@ module.exports = function () {
 	 * @returns {boolean} whether the value is valid or nor
 	 * @throw if the schema is invalid
 	 */
-	var context = function (schema, value, options) {
+	function context(schema, value, options) {
 		schema = context.parse(schema)
 		let ret = schema.validate(value, options)
 		context.lastError = schema.lastError
@@ -69,16 +69,16 @@ module.exports = function () {
 		} else if (typeof fields === 'string' && (field = parseTagged(fields, taggedTypes))) {
 			return field
 		}
-			// Search by a type, executing the callbacks
-			for (i = 0; i < callbackTypes.fns.length; i++) {
-				extra = callbackTypes.fns[i](fields, context.parse)
-				if (extra !== undefined) {
-					return new Field(callbackTypes.types[i], extra)
-				}
+		// Search by a type, executing the callbacks
+		for (i = 0; i < callbackTypes.fns.length; i++) {
+			extra = callbackTypes.fns[i](fields, context.parse)
+			if (extra !== undefined) {
+				return new Field(callbackTypes.types[i], extra)
 			}
+		}
 
-			// Nothing found
-			throw new Error('I couldn\'t understand field definition: ' + fields)
+		// Nothing found
+		throw new Error('I couldn\'t understand field definition: ' + fields)
 
 	}
 

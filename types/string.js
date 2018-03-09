@@ -1,6 +1,6 @@
 'use strict'
 
-let base64Regex = /^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/][AQgw]==|[A-Za-z0-9+\/]{2}[AEIMQUYcgkosw048]=)?$/
+let base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/][AQgw]==|[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048]=)?$/
 
 module.exports = function (context) {
 	/**
@@ -23,9 +23,9 @@ module.exports = function (context) {
 
 		return date
 	}, '$Date', () => ({
-			type: 'string',
-			format: 'date-time'
-		}))
+		type: 'string',
+		format: 'date-time'
+	}))
 
 	/**
 	 * A non-empty string with limited length
@@ -53,13 +53,12 @@ module.exports = function (context) {
 			if (value.length !== args[0]) {
 				throw 'I was expecting exactly ' + args[0] + ' chars'
 			}
-		} else {
-			// Min/max length
-			if (args[0] !== undefined && value.length < args[0]) {
-				throw 'I was expecting at least ' + args[0] + ' chars'
-			} else if (args[1] !== undefined && value.length > args[1]) {
-				throw 'I was expecting at most ' + args[1] + ' chars'
-			}
+		} else if (args[0] !== undefined && value.length < args[0]) {
+			// Min length
+			throw 'I was expecting at least ' + args[0] + ' chars'
+		} else if (args[1] !== undefined && value.length > args[1]) {
+			// Max length
+			throw 'I was expecting at most ' + args[1] + ' chars'
 		}
 
 		return value
@@ -135,9 +134,9 @@ module.exports = function (context) {
 			throw 'I was expecting one of [' + args.join(', ') + ']'
 		}
 	}, extra => extra.original, args => ({
-			type: 'string',
-			enum: args.slice()
-		}))
+		type: 'string',
+		enum: args.slice()
+	}))
 }
 
 /**
