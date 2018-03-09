@@ -21,7 +21,7 @@ function Field(type, extra) {
 
 module.exports = Field
 
-var ValidationError = require('./ValidationError')
+let ValidationError = require('./ValidationError')
 
 /**
  * Check if the value is follows the fields schema
@@ -39,9 +39,9 @@ Field.prototype.validate = function (value, options) {
 			this.lastErrorMessage = e.message
 			this.lastErrorPath = e.path
 			return false
-		} else {
-			throw e
 		}
+			throw e
+
 	}
 	this.lastError = ''
 	return true

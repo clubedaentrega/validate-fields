@@ -1,11 +1,11 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
 require('should')
-var validate = require('../')()
+let validate = require('../')()
 
-describe('emptiness', function () {
-	var schema = validate.parse({
+describe('emptiness', () => {
+	let schema = validate.parse({
 		'num?': Number,
 		'str?': String,
 		'bool?': Boolean,
@@ -14,7 +14,7 @@ describe('emptiness', function () {
 		'*?': '*'
 	})
 
-	it('should consider missing field, undefined and null as empty', function () {
+	it('should consider missing field, undefined and null as empty', () => {
 		schema.validate({}).should.be.true()
 		schema.validate({
 			num: undefined,
@@ -34,7 +34,7 @@ describe('emptiness', function () {
 		}).should.be.true()
 	})
 
-	it('should consider "" as empty only if the field is of type string', function () {
+	it('should consider "" as empty only if the field is of type string', () => {
 		check('str').should.be.true()
 
 		check('num').should.be.false()
@@ -43,13 +43,13 @@ describe('emptiness', function () {
 		check('arr').should.be.false()
 
 		function check(key) {
-			var obj = {}
+			let obj = {}
 			obj[key] = ''
 			return schema.validate(obj) && !(key in obj)
 		}
 	})
 
-	it('should consider [] as valid but not empty if the field is of type array', function () {
+	it('should consider [] as valid but not empty if the field is of type array', () => {
 		check('arr').should.be.true()
 
 		check('str').should.be.false()
@@ -58,14 +58,14 @@ describe('emptiness', function () {
 		check('obj').should.be.false()
 
 		function check(key) {
-			var obj = {}
+			let obj = {}
 			obj[key] = []
 			return schema.validate(obj) && (key in obj)
 		}
 	})
 
-	it('should accept "" and [] for * fields and not consider it empty', function () {
-		var obj1 = {
+	it('should accept "" and [] for * fields and not consider it empty', () => {
+		let obj1 = {
 				'*': ''
 			},
 			obj2 = {

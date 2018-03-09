@@ -1,15 +1,15 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
 require('should')
-var validate = require('../')()
+let validate = require('../')()
 
 /**
  * @param {*} definition
  * @param {*} [finalDefinition=definition]
  */
 function check(definition, finalDefinition) {
-	var fields = validate.parse(definition),
+	let fields = validate.parse(definition),
 		finalFields = finalDefinition ? validate.parse(finalDefinition) : fields,
 		string = JSON.stringify(fields),
 		parsed = JSON.parse(string, validate.reviver),
@@ -17,8 +17,8 @@ function check(definition, finalDefinition) {
 	finalFields.should.be.eql(fields2)
 }
 
-describe('JSON', function () {
-	it('should work for object types', function () {
+describe('JSON', () => {
+	it('should work for object types', () => {
 		check({
 			number: Number,
 			string: String,
@@ -29,7 +29,7 @@ describe('JSON', function () {
 		})
 	})
 
-	it('should work for hash and array', function () {
+	it('should work for hash and array', () => {
 		check({
 			required: Number,
 			'optional?': Number,
@@ -42,7 +42,7 @@ describe('JSON', function () {
 		})
 	})
 
-	it('should work for string types', function () {
+	it('should work for string types', () => {
 		check({
 			int: 'int',
 			uint: 'uint',
@@ -58,7 +58,7 @@ describe('JSON', function () {
 		})
 	})
 
-	it('should work for regex', function () {
+	it('should work for regex', () => {
 		check({
 			simple: /hi/,
 			global: /hi/g,
@@ -67,7 +67,7 @@ describe('JSON', function () {
 		})
 	})
 
-	it('should work for typedefs', function () {
+	it('should work for typedefs', () => {
 		validate.typedef('user', {
 			name: String,
 			age: 'uint',
@@ -83,7 +83,7 @@ describe('JSON', function () {
 		})
 	})
 
-	it('should turn custom types into more general types', function () {
+	it('should turn custom types into more general types', () => {
 		validate.registerType('my-string', 'string')
 		validate.registerType('my-number', 'number')
 		validate.registerType('my-boolean', 'boolean')
@@ -104,10 +104,10 @@ describe('JSON', function () {
 		})
 	})
 
-	it('should call toJSON on values', function () {
-		var called = false
+	it('should call toJSON on values', () => {
+		let called = false
 		validate(String, {
-			toJSON: function () {
+			toJSON () {
 				called = true
 				return 'a string'
 			}
@@ -115,12 +115,12 @@ describe('JSON', function () {
 		called.should.be.true()
 	})
 
-	it('should not call toJSON on raw types', function () {
-		validate.registerType('my-type', 'raw', function () {})
+	it('should not call toJSON on raw types', () => {
+		validate.registerType('my-type', 'raw', () => {})
 
-		var called = false
+		let called = false
 		validate('my-type', {
-			toJSON: function () {
+			toJSON () {
 				called = true
 				return 'a string'
 			}

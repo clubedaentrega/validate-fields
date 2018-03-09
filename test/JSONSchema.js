@@ -1,11 +1,11 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
 require('should')
-var validate = require('../')()
+let validate = require('../')()
 
-describe('JSONSchema', function () {
-	it('should work for object types', function () {
+describe('JSONSchema', () => {
+	it('should work for object types', () => {
 		validate.parse({
 			number: Number,
 			string: String,
@@ -40,7 +40,7 @@ describe('JSONSchema', function () {
 		})
 	})
 
-	it('should work for hash and array', function () {
+	it('should work for hash and array', () => {
 		validate.parse({
 			required: Number,
 			'optional?': Number,
@@ -88,7 +88,7 @@ describe('JSONSchema', function () {
 		})
 	})
 
-	it('should work for string types', function () {
+	it('should work for string types', () => {
 		validate.parse({
 			int: 'int',
 			uint: 'uint',
@@ -156,7 +156,7 @@ describe('JSONSchema', function () {
 		})
 	})
 
-	it('should work for regex', function () {
+	it('should work for regex', () => {
 		validate.parse({
 			simple: /hi/,
 			global: /hi/g,
@@ -182,13 +182,13 @@ describe('JSONSchema', function () {
 				escaped: {
 					type: 'string',
 					pattern: '^\\/\\\\\\.$'
-				},
+				}
 			},
 			required: ['simple', 'global', 'flags', 'escaped']
 		})
 	})
 
-	it('should work for typedefs', function () {
+	it('should work for typedefs', () => {
 		validate.typedef('user', {
 			name: String
 		})
@@ -208,7 +208,7 @@ describe('JSONSchema', function () {
 		})
 	})
 
-	it('should turn custom types into more general types', function () {
+	it('should turn custom types into more general types', () => {
 		validate.registerType('my-string', 'string')
 		validate.registerType('my-number', 'number')
 		validate.registerType('my-boolean', 'boolean')

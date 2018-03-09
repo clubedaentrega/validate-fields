@@ -1,12 +1,12 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
 require('should')
-var validate = require('../')()
+let validate = require('../')()
 
-describe('default values', function () {
-	it('should work for basic default values', function () {
-		var obj = {},
+describe('default values', () => {
+	it('should work for basic default values', () => {
+		let obj = {},
 			obj2 = {
 				noDefault: null,
 				default: null
@@ -27,8 +27,8 @@ describe('default values', function () {
 		})
 	})
 
-	it('should check JSON syntax at parse time', function () {
-		var boom = function () {
+	it('should check JSON syntax at parse time', () => {
+		let boom = function () {
 			validate.parse({
 				'a=invalid JSON': Number
 			})
@@ -36,8 +36,8 @@ describe('default values', function () {
 		boom.should.throw(/^I was expecting a valid JSON/)
 	})
 
-	it('should validate default value at parse time', function () {
-		var boom = function () {
+	it('should validate default value at parse time', () => {
+		let boom = function () {
 			validate.parse({
 				'a="not a number"': Number
 			})
@@ -45,8 +45,8 @@ describe('default values', function () {
 		boom.should.throw(/^I was expecting a valid default value/)
 	})
 
-	it('should apply subfields default values', function () {
-		var obj = {}
+	it('should apply subfields default values', () => {
+		let obj = {}
 		validate({
 			'a={}': {
 				'b=2': Number

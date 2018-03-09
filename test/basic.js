@@ -1,14 +1,14 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
 require('should')
 
-var validate = require('../')()
+let validate = require('../')()
 
-describe('basic types', function () {
-	var fields
+describe('basic types', () => {
+	let fields
 
-	it('should parse basic types', function () {
+	it('should parse basic types', () => {
 		fields = validate.parse({
 			aNumber: Number,
 			aString: String,
@@ -16,7 +16,7 @@ describe('basic types', function () {
 		})
 	})
 
-	it('should validate basic types', function () {
+	it('should validate basic types', () => {
 		fields.validate({
 			aNumber: 17,
 			aString: 'hi'
@@ -29,7 +29,7 @@ describe('basic types', function () {
 		}).should.be.true()
 	})
 
-	it('should report the right error', function () {
+	it('should report the right error', () => {
 		validate({
 			key: Number
 		}, {
@@ -40,8 +40,8 @@ describe('basic types', function () {
 		validate.lastErrorPath.should.be.equal('key')
 	})
 
-	it('should not escape HTML', function () {
-		var obj = {
+	it('should not escape HTML', () => {
+		let obj = {
 			aNumber: 0,
 			aString: 'escape <html>'
 		}
@@ -49,7 +49,7 @@ describe('basic types', function () {
 		obj.aString.should.be.equal('escape <html>')
 	})
 
-	it('should not allow extraneous keys in strict mode', function () {
+	it('should not allow extraneous keys in strict mode', () => {
 		validate({
 			a: Number,
 			'b?': Number
@@ -62,8 +62,8 @@ describe('basic types', function () {
 		}).should.be.false()
 	})
 
-	it('should allow and remove extraneous keys with undefined in strict mode', function () {
-		var obj = {
+	it('should allow and remove extraneous keys with undefined in strict mode', () => {
+		let obj = {
 			a: 3,
 			b: 14,
 			c: undefined
@@ -82,8 +82,8 @@ describe('basic types', function () {
 		})
 	})
 
-	it('should escape HTML when told to', function () {
-		var obj = {
+	it('should escape HTML when told to', () => {
+		let obj = {
 			aNumber: 0,
 			aString: 'escape <html>'
 		}
@@ -93,14 +93,14 @@ describe('basic types', function () {
 		obj.aString.should.be.equal('escape &lt;html&gt;')
 	})
 
-	it('should not accept a missing key', function () {
+	it('should not accept a missing key', () => {
 		fields.validate({
 			aNumber: 0
 		}).should.be.false()
 		fields.lastError.should.be.equal('I was expecting a value in aString')
 	})
 
-	it('should not accept NaN, Infinity and -Infinity', function () {
+	it('should not accept NaN, Infinity and -Infinity', () => {
 		fields.validate({
 			aNumber: NaN
 		}).should.be.false()
@@ -112,7 +112,7 @@ describe('basic types', function () {
 		}).should.be.false()
 	})
 
-	it('should not accept an empty string', function () {
+	it('should not accept an empty string', () => {
 		fields.validate({
 			aNumber: 0,
 			aString: ''
@@ -120,21 +120,21 @@ describe('basic types', function () {
 		fields.lastError.should.be.equal('I was expecting a non-empty value in aString')
 	})
 
-	it('should work for null-prototype maps', function () {
-		var map = Object.create(null)
+	it('should work for null-prototype maps', () => {
+		let map = Object.create(null)
 		map.a = String
 		validate(map, {
 			a: 'hi'
 		}).should.be.true()
 	})
 
-	it('should work for string with fixed size', function () {
+	it('should work for string with fixed size', () => {
 		validate('string(5)', '12345').should.be.true()
 		validate('string(5)', '1234').should.be.false()
 		validate('string(5)', '123456').should.be.false()
 	})
 
-	it('should work for string with min and max size', function () {
+	it('should work for string with min and max size', () => {
 		validate('string(,5)', '12345').should.be.true()
 		validate('string(,5)', '123456').should.be.false()
 
@@ -147,7 +147,7 @@ describe('basic types', function () {
 		validate('string(5,6)', '1234567').should.be.false()
 	})
 
-	it('should work for hex strings', function () {
+	it('should work for hex strings', () => {
 		validate('hex', 'babaca').should.be.true()
 		validate('hex', 'babacx').should.be.false()
 		validate('hex', 'babac').should.be.false()
@@ -156,7 +156,7 @@ describe('basic types', function () {
 		validate('hex(5)', 'babac').should.be.true()
 	})
 
-	it('should work for base64 strings', function () {
+	it('should work for base64 strings', () => {
 		validate('base64', 'AA==').should.be.true()
 		validate('base64', 'AAA=').should.be.true()
 		validate('base64', 'AAAA').should.be.true()
@@ -165,14 +165,14 @@ describe('basic types', function () {
 		validate('base64', '$').should.be.false()
 	})
 
-	it('should work for set of strings', function () {
+	it('should work for set of strings', () => {
 		validate('in(ab, cd, ef)', 'ab').should.be.true()
 		validate('in(ab, cd, ef)', 'gh').should.be.false()
 		validate('in()', 'a').should.be.false()
 		validate('in(1, 2, 3)', 2).should.be.false()
 	})
 
-	it('should work for numeric types', function () {
+	it('should work for numeric types', () => {
 		validate(Number, 3.14).should.be.true()
 		validate(Number, '3.14').should.be.false()
 
@@ -185,7 +185,7 @@ describe('basic types', function () {
 		validate('uint', '3').should.be.false()
 	})
 
-	it('should work for numeric ranges', function () {
+	it('should work for numeric ranges', () => {
 		validate('number(-2.5, 3.5)', -2.6).should.be.false()
 		validate('number(-2.5, 3.5)', -2.5).should.be.true()
 		validate('number(-2.5, 3.5)', -2).should.be.true()
@@ -211,7 +211,7 @@ describe('basic types', function () {
 		validate('uint(-2.5, 3.5)', 3.6).should.be.false()
 	})
 
-	it('should work for set of numbers', function () {
+	it('should work for set of numbers', () => {
 		validate('numberIn(3, 1.4, -15)', 3).should.be.true()
 		validate('numberIn(3, 1.4, -15)', 1.4).should.be.true()
 		validate('numberIn(3, 1.4, -15)', -15).should.be.true()
@@ -220,7 +220,7 @@ describe('basic types', function () {
 		validate('numberIn(3, 1.4, -15)', '3').should.be.false()
 	})
 
-	it('should accept anything for *', function () {
+	it('should accept anything for *', () => {
 		validate('*', 3.14).should.be.true()
 		validate('*', 'Hello').should.be.true()
 		validate('*', false).should.be.true()
@@ -250,7 +250,7 @@ describe('basic types', function () {
 		}).should.be.true()
 	})
 
-	it('should not consider an array a valid object (and vice versa)', function () {
+	it('should not consider an array a valid object (and vice versa)', () => {
 		validate({
 			0: Number,
 			length: Number
@@ -262,15 +262,15 @@ describe('basic types', function () {
 		}).should.be.false()
 	})
 
-	it('should accept a Date for Date', function () {
+	it('should accept a Date for Date', () => {
 		validate(Date, new Date).should.be.true()
 	})
 
-	it('should call toJSON when present', function () {
+	it('should call toJSON when present', () => {
 		validate({
 			a: Number
 		}, {
-			toJSON: function () {
+			toJSON () {
 				return {
 					a: 12
 				}

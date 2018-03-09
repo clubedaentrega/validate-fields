@@ -5,7 +5,7 @@ module.exports = function (context) {
 	 * A non-null generic object. No property is validated inside the object
 	 * Example: {date: Date, event: Object}
 	 */
-	context.registerObjectType(Object, 'object', function (value) {
+	context.registerObjectType(Object, 'object', value => {
 		if (value === null) {
 			throw 'I was expecting a non-null object'
 		}
@@ -29,18 +29,16 @@ module.exports = function (context) {
 	 * A string that matches a custom regex
 	 * Example: /^\d+\.\d{2}$/ matches '3.14'
 	 */
-	context.registerType(function (definition) {
+	context.registerType(definition => {
 		if (definition instanceof RegExp) {
 			return definition
 		}
-	}, 'string', function (value, extra) {
+	}, 'string', (value, extra) => {
 		if (!value.match(extra)) {
 			throw 'I was expecting a string that matches ' + extra
 		}
-	}, function (extra) {
-		return '$RegExp:' + prepareFlags(extra) + ':' + extra.source
-	}, function (extra) {
-		var flags = prepareFlags(extra),
+	}, extra => '$RegExp:' + prepareFlags(extra) + ':' + extra.source, extra => {
+		let flags = prepareFlags(extra),
 			ret = {
 				type: 'string',
 				pattern: extra.source

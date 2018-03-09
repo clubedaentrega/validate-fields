@@ -8,7 +8,7 @@
  * @param {toJSONSchemaCallback} [toJSONSchema]
  */
 function Type(jsonType, checkFn, toJSON, toJSONSchema) {
-	var types = ['number', 'string', 'boolean', 'object', 'array', '*', 'raw']
+	let types = ['number', 'string', 'boolean', 'object', 'array', '*', 'raw']
 
 	if (typeof jsonType !== 'string') {
 		throw new Error('jsType must be a string')
@@ -51,7 +51,7 @@ Type.prototype.validate = function (value, path, extra, options) {
 		value = value.toJSON()
 	}
 
-	var type, ret
+	let type, ret
 	if (Array.isArray(value)) {
 		type = 'array'
 	} else if (value === null) {
@@ -120,7 +120,7 @@ Type.prototype.convertToJSONSchema = function (extra, expandTypedefs) {
 	}
 
 	// Aproximated convertion
-	var jsonSchemaType = {
+	let jsonSchemaType = {
 		number: 'number',
 		string: 'string',
 		boolean: 'boolean',

@@ -1,12 +1,12 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
-var should = require('should')
+let should = require('should')
 
-var validate = require('../')()
+let validate = require('../')()
 
-describe('tagged types', function () {
-	it('should handle any number of args', function () {
+describe('tagged types', () => {
+	it('should handle any number of args', () => {
 		validate.registerTaggedType({
 			tag: 'tagAny',
 			jsonType: 'string'
@@ -18,12 +18,12 @@ describe('tagged types', function () {
 		checkExtra('tagAny(a, b)', ['a', 'b'])
 		checkExtra('tagAny(a, b, c)', ['a', 'b', 'c'])
 
-		should(function () {
+		should(() => {
 			validate.parse('tagAny(a, , c)')
 		}).throw('Missing argument at position 1 for tagged type tagAny')
 	})
 
-	it('should handle minimum number of args', function () {
+	it('should handle minimum number of args', () => {
 		validate.registerTaggedType({
 			tag: 'tagMin',
 			jsonType: 'string',
@@ -34,20 +34,20 @@ describe('tagged types', function () {
 		checkExtra('tagMin(a, b)', ['a', 'b'])
 		checkExtra('tagMin(a, b, c)', ['a', 'b', 'c'])
 
-		should(function () {
+		should(() => {
 			validate.parse('tagMin')
 		}).throw('I couldn\'t understand field definition: tagMin')
 
-		should(function () {
+		should(() => {
 			validate.parse('tagMin()')
 		}).throw('Too few arguments for tagged type tagMin')
 
-		should(function () {
+		should(() => {
 			validate.parse('tagMin(a, , c)')
 		}).throw('Missing argument at position 1 for tagged type tagMin')
 	})
 
-	it('should handle maximum number of args', function () {
+	it('should handle maximum number of args', () => {
 		validate.registerTaggedType({
 			tag: 'tagMax',
 			jsonType: 'string',
@@ -59,16 +59,16 @@ describe('tagged types', function () {
 		checkExtra('tagMax(a)', ['a'])
 		checkExtra('tagMax(a, b)', ['a', 'b'])
 
-		should(function () {
+		should(() => {
 			validate.parse('tagMax(a, b, c)')
 		}).throw('Too many arguments for tagged type tagMax')
 
-		should(function () {
+		should(() => {
 			validate.parse('tagMax(a, , c)')
 		}).throw('Missing argument at position 1 for tagged type tagMax')
 	})
 
-	it('should handle sparse args', function () {
+	it('should handle sparse args', () => {
 		validate.registerTaggedType({
 			tag: 'tagSparse',
 			jsonType: 'string',
@@ -85,7 +85,7 @@ describe('tagged types', function () {
 		checkExtra('tagSparse(a, b, )', ['a', 'b', undefined])
 	})
 
-	it('should handle numeric args', function () {
+	it('should handle numeric args', () => {
 		validate.registerTaggedType({
 			tag: 'tagNumeric',
 			jsonType: 'string',
@@ -97,24 +97,22 @@ describe('tagged types', function () {
 		checkExtra('tagNumeric(1)', [1])
 		checkExtra('tagNumeric(1, 2)', [1, 2])
 
-		should(function () {
+		should(() => {
 			validate.parse('tagNumeric(1, , 3)')
 		}).throw('Missing argument at position 1 for tagged type tagNumeric')
 
-		should(function () {
+		should(() => {
 			validate.parse('tagNumeric(banana)')
 		}).throw('Invalid numeric argument at position 0 for tagged type tagNumeric')
 	})
 
-	it('should call parse args callback', function () {
+	it('should call parse args callback', () => {
 		validate.registerTaggedType({
 			tag: 'tagParseArgs',
 			jsonType: 'string',
 			numeric: true,
-			parseArgs: function (args) {
-				return args.map(function (n, i) {
-					return n * i
-				})
+			parseArgs (args) {
+				return args.map((n, i) => n * i)
 			}
 		})
 

@@ -1,6 +1,6 @@
 'use strict'
 
-var base64Regex = /^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/][AQgw]==|[A-Za-z0-9+\/]{2}[AEIMQUYcgkosw048]=)?$/
+let base64Regex = /^([A-Za-z0-9+\/]{4})*([A-Za-z0-9+\/][AQgw]==|[A-Za-z0-9+\/]{2}[AEIMQUYcgkosw048]=)?$/
 
 module.exports = function (context) {
 	/**
@@ -8,28 +8,24 @@ module.exports = function (context) {
 	 * Example: {name: {first: String, 'last?': String}}
 	 * The string will be HTML escaped if options.escape is true
 	 */
-	context.registerObjectType(String, 'string', function (value, _, options) {
-		return options.escape ? escape(value) : value
-	}, '$String')
+	context.registerObjectType(String, 'string', (value, _, options) => options.escape ? escape(value) : value, '$String')
 
 	/**
 	 * A date value in string format (like '2014-08-08T16:14:16.046Z')
 	 * It will convert the string into a date object
 	 * It accepts all formats defined by the Date(str) constructor, but the a ISO string is recommended
 	 */
-	context.registerObjectType(Date, 'string', function (value) {
-		var date = new Date(value)
+	context.registerObjectType(Date, 'string', value => {
+		let date = new Date(value)
 		if (isNaN(date.getTime())) {
 			throw 'I was expecting a date string'
 		}
 
 		return date
-	}, '$Date', function () {
-		return {
+	}, '$Date', () => ({
 			type: 'string',
 			format: 'date-time'
-		}
-	})
+		}))
 
 	/**
 	 * A non-empty string with limited length
@@ -47,7 +43,7 @@ module.exports = function (context) {
 		maxArgs: 2,
 		sparse: true,
 		numeric: true
-	}, function (value, args, options) {
+	}, (value, args, options) => {
 		if (options.escape) {
 			value = escape(value)
 		}
@@ -67,9 +63,7 @@ module.exports = function (context) {
 		}
 
 		return value
-	}, function (extra) {
-		return extra.original
-	}, function (args) {
+	}, extra => extra.original, args => {
 		if (args.length === 1) {
 			return buildSchema(undefined, args[0], args[0])
 		}
@@ -87,7 +81,7 @@ module.exports = function (context) {
 		jsonType: 'string',
 		maxArgs: 1,
 		numeric: true
-	}, function (value, args) {
+	}, (value, args) => {
 		if (!value.match(/^[0-9a-fA-F]+$/)) {
 			throw 'I was expecting a hex-encoded string'
 		} else if (args.length && value.length !== args[0]) {
@@ -95,33 +89,25 @@ module.exports = function (context) {
 		} else if (!args.length && value.length % 2) {
 			throw 'I was expecting an even number of hex-chars'
 		}
-	}, function (extra) {
-		return extra.original
-	}, function (args) {
-		return buildSchema('hex', args[0], args[0])
-	})
+	}, extra => extra.original, args => buildSchema('hex', args[0], args[0]))
 
 	/**
 	 * A base64 string, with valid padding
 	 */
-	context.registerType('base64', 'string', function (value) {
+	context.registerType('base64', 'string', value => {
 		if (!base64Regex.test(value)) {
 			throw 'I was expecting a base64-encoded string'
 		}
-	}, 'base64', function () {
-		return buildSchema('byte')
-	})
+	}, 'base64', () => buildSchema('byte'))
 
 	/**
 	 * A mongo objectId as a 24-hex-char string
 	 */
-	context.registerType('id', 'string', function (value) {
+	context.registerType('id', 'string', value => {
 		if (!value.match(/^[0-9a-fA-F]{24}$/)) {
 			throw 'I was expecting a mongo objectId'
 		}
-	}, 'id', function () {
-		return buildSchema('id')
-	})
+	}, 'id', () => buildSchema('id'))
 
 	/**
 	 * An email
@@ -130,14 +116,12 @@ module.exports = function (context) {
 	 * 2) The right way to check if a email is valid is trying to send an message to it!
 	 *    (even this is broken: it's easy to get a temporary trash mailbox)
 	 */
-	context.registerType('email', 'string', function (value) {
+	context.registerType('email', 'string', value => {
 		// The regex forces one '@', followed by at least one '.'
 		if (!value.match(/^[^@]+@.+\.[^.]+$/i)) {
 			throw 'I was expecting an email address'
 		}
-	}, 'email', function () {
-		return buildSchema('email')
-	})
+	}, 'email', () => buildSchema('email'))
 
 	/**
 	 * A string from the given set
@@ -146,18 +130,14 @@ module.exports = function (context) {
 	context.registerTaggedType({
 		tag: 'in',
 		jsonType: 'string'
-	}, function (value, args) {
+	}, (value, args) => {
 		if (args.indexOf(value) === -1) {
 			throw 'I was expecting one of [' + args.join(', ') + ']'
 		}
-	}, function (extra) {
-		return extra.original
-	}, function (args) {
-		return {
+	}, extra => extra.original, args => ({
 			type: 'string',
 			enum: args.slice()
-		}
-	})
+		}))
 }
 
 /**
@@ -178,7 +158,7 @@ function escape(str) {
  * @param {number} [max]
  */
 function buildSchema(format, min, max) {
-	var ret = {
+	let ret = {
 		type: 'string'
 	}
 

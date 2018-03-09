@@ -1,6 +1,6 @@
 'use strict'
 
-var ValidationError = require('../ValidationError')
+let ValidationError = require('../ValidationError')
 
 module.exports = function (context) {
 	/**
@@ -12,8 +12,8 @@ module.exports = function (context) {
 	 * If options.strict is set, extraneous fields will be considered as invalid.
 	 * Example: validate({}, {a: 2}, {strict: true}) // false: I wasn't expecting a value in a
 	 */
-	context.registerType(function (definition, parse) {
-		var extra
+	context.registerType((definition, parse) => {
+		let extra
 
 		if (typeof definition !== 'object' ||
 			!definition ||
@@ -27,8 +27,8 @@ module.exports = function (context) {
 			optional: Object.create(null)
 		}
 
-		Object.keys(definition).forEach(function (key) {
-			var info = parseKey(key),
+		Object.keys(definition).forEach(key => {
+			let info = parseKey(key),
 				field = parse(definition[key])
 
 			if (info.name in extra.optional || info.name in extra.required) {
@@ -39,7 +39,7 @@ module.exports = function (context) {
 				checkDefault(info.defaultSource, field)
 
 				extra.optional[info.name] = {
-					field: field,
+					field,
 					defaultSource: info.defaultSource
 				}
 			} else {
@@ -48,8 +48,8 @@ module.exports = function (context) {
 		})
 
 		return extra
-	}, 'object', function (value, extra, options, path) {
-		var key, field, subpath, info
+	}, 'object', (value, extra, options, path) => {
+		let key, field, subpath, info
 
 		// Check required fields
 		for (key in extra.required) {
@@ -94,8 +94,8 @@ module.exports = function (context) {
 		}
 
 		return value
-	}, function (extra) {
-		var ret = Object.create(null),
+	}, extra => {
+		let ret = Object.create(null),
 			key, info
 
 		for (key in extra.required) {
@@ -111,8 +111,8 @@ module.exports = function (context) {
 		}
 
 		return ret
-	}, function (extra, expandTypedefs) {
-		var ret = {
+	}, (extra, expandTypedefs) => {
+		let ret = {
 				type: 'object',
 				properties: {},
 				required: []
@@ -151,7 +151,7 @@ module.exports = function (context) {
  * @returns {KeyInfo}
  */
 function parseKey(key) {
-	var name = key,
+	let name = key,
 		optional = false,
 		pos = key.indexOf('='),
 		defaultSource
@@ -168,9 +168,9 @@ function parseKey(key) {
 	}
 
 	return {
-		name: name,
-		optional: optional,
-		defaultSource: defaultSource
+		name,
+		optional,
+		defaultSource
 	}
 }
 
@@ -180,7 +180,7 @@ function parseKey(key) {
  * @throws if invalid
  */
 function checkDefault(source, field) {
-	var value
+	let value
 
 	if (source === undefined) {
 		// No default

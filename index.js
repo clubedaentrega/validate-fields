@@ -1,29 +1,29 @@
 'use strict'
 
-var Field = require('./Field.js'),
+let Field = require('./Field.js'),
 	Type = require('./Type.js')
 
 module.exports = function () {
 	/** Store types defined by a string */
-	var simpleTypes = Object.create(null)
+	let simpleTypes = Object.create(null)
 
 	/** Store types defined in terms of other ones */
-	var typedefs = Object.create(null)
+	let typedefs = Object.create(null)
 
 	/** Store types defined by an object */
-	var objectTypes = {
+	let objectTypes = {
 		objects: [],
 		types: []
 	}
 
 	/** Store types defined by a callback */
-	var callbackTypes = {
+	let callbackTypes = {
 		fns: [],
 		types: []
 	}
 
 	/** Store types defined by tags */
-	var taggedTypes = Object.create(null)
+	let taggedTypes = Object.create(null)
 
 	/**
 	 * Validate the given value against the given schema
@@ -35,7 +35,7 @@ module.exports = function () {
 	 */
 	var context = function (schema, value, options) {
 		schema = context.parse(schema)
-		var ret = schema.validate(value, options)
+		let ret = schema.validate(value, options)
 		context.lastError = schema.lastError
 		context.lastErrorMessage = schema.lastErrorMessage
 		context.lastErrorPath = schema.lastErrorPath
@@ -55,7 +55,7 @@ module.exports = function () {
 	 * @throw if the definition is invalid
 	 */
 	context.parse = function (fields) {
-		var pos, i, extra, field
+		let pos, i, extra, field
 
 		if (typeof fields === 'string' && fields in simpleTypes) {
 			// Type defined by a string
@@ -68,7 +68,7 @@ module.exports = function () {
 			return new Field(objectTypes.types[pos])
 		} else if (typeof fields === 'string' && (field = parseTagged(fields, taggedTypes))) {
 			return field
-		} else {
+		}
 			// Search by a type, executing the callbacks
 			for (i = 0; i < callbackTypes.fns.length; i++) {
 				extra = callbackTypes.fns[i](fields, context.parse)
@@ -79,7 +79,7 @@ module.exports = function () {
 
 			// Nothing found
 			throw new Error('I couldn\'t understand field definition: ' + fields)
-		}
+
 	}
 
 	/**
@@ -145,7 +145,7 @@ module.exports = function () {
 	 * @param {toJSONSchemaCallback} [toJSONSchema] - Used only by core types
 	 */
 	context.registerType = function (definition, jsonType, checkFn, toJSON, toJSONSchema) {
-		var type = new Type(jsonType, checkFn || function () {}, toJSON, toJSONSchema)
+		let type = new Type(jsonType, checkFn || (() => {}), toJSON, toJSONSchema)
 		if (typeof definition === 'string') {
 			// Simple definition: match a single string
 			if (definition in simpleTypes || definition in typedefs) {
@@ -154,8 +154,8 @@ module.exports = function () {
 			simpleTypes[definition] = type
 		} else if (definition instanceof RegExp) {
 			// Defined by a RegExp: create a callback
-			callbackTypes.fns.push(function (def2) {
-				var match
+			callbackTypes.fns.push(def2 => {
+				let match
 				if (typeof def2 === 'string' && (match = def2.match(definition))) {
 					return match
 				}
@@ -192,7 +192,7 @@ module.exports = function () {
 	 * @param {toJSONSchemaCallback} [toJSONSchema] - Used only by core types
 	 */
 	context.registerObjectType = function (definition, jsonType, checkFn, toJSON, toJSONSchema) {
-		var type = new Type(jsonType, checkFn || function () {}, toJSON, toJSONSchema)
+		let type = new Type(jsonType, checkFn || (() => {}), toJSON, toJSONSchema)
 		if (objectTypes.objects.indexOf(definition) !== -1) {
 			throw new Error('Type ' + definition + ' already registered')
 		}
@@ -221,15 +221,15 @@ module.exports = function () {
 			throw new Error('definition.tag and definition.jsonType are required')
 		}
 
-		var tag = definition.tag,
-			type = new Type(definition.jsonType, checkFn || function () {}, toJSON, toJSONSchema)
+		let tag = definition.tag,
+			type = new Type(definition.jsonType, checkFn || (() => {}), toJSON, toJSONSchema)
 
 		if (tag in taggedTypes) {
 			throw new Error('Tag ' + tag + ' already registered')
 		}
 
 		taggedTypes[tag] = {
-			type: type,
+			type,
 			minArgs: definition.minArgs || 0,
 			maxArgs: definition.maxArgs || 0,
 			sparse: Boolean(definition.sparse),
@@ -248,11 +248,11 @@ module.exports = function () {
 	 */
 	context.getRegisteredTypes = function () {
 		return {
-			simpleTypes: simpleTypes,
-			typedefs: typedefs,
-			objectTypes: objectTypes,
-			callbackTypes: callbackTypes,
-			taggedTypes: taggedTypes
+			simpleTypes,
+			typedefs,
+			objectTypes,
+			callbackTypes,
+			taggedTypes
 		}
 	}
 
@@ -273,7 +273,7 @@ module.exports = function () {
  * @returns {?Field}
  */
 function parseTagged(definition, taggedTypes) {
-	var match = definition.match(/^(\w+)(?:\((.*)\))?$/),
+	let match = definition.match(/^(\w+)(?:\((.*)\))?$/),
 		tag, args, typeInfo
 	if (!match) {
 		return
@@ -297,7 +297,7 @@ function parseTagged(definition, taggedTypes) {
 		// Especial empty case
 		args = []
 	}
-	args = args.map(function (arg, i) {
+	args = args.map((arg, i) => {
 		if (!arg) {
 			if (!typeInfo.sparse) {
 				throw new Error('Missing argument at position ' + i + ' for tagged type ' + tag)
@@ -324,13 +324,13 @@ function parseTagged(definition, taggedTypes) {
 	return new Field(typeInfo.type, typeInfo.parseArgs ? typeInfo.parseArgs(args) : args)
 }
 
-var JSONMap = {
+let JSONMap = {
 	$Number: Number,
 	$String: String,
 	$Object: Object,
 	$Array: Array,
 	$Boolean: Boolean,
-	$Date: Date,
+	$Date: Date
 }
 
 /**
@@ -341,7 +341,7 @@ var JSONMap = {
  * @returns {*}
  */
 module.exports.reviver = function (key, value) {
-	var match
+	let match
 
 	if (typeof value === 'string' && value[0] === '$') {
 		// Special types

@@ -1,15 +1,15 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
 require('should')
 
-var validate = require('../')()
+let validate = require('../')()
 
-describe.skip('benchmark', function () {
-	var parsed
+describe.skip('benchmark', () => {
+	let parsed
 
 	it('should parse fast', function () {
-		var i
+		let i
 		this.timeout(50) // 50us
 		for (i = 0; i < 1e3; i++) {
 			parsed = validate.parse({
@@ -34,7 +34,7 @@ describe.skip('benchmark', function () {
 	})
 
 	it('should validate fast', function () {
-		var i
+		let i
 		this.timeout(100) // 100us
 		for (i = 0; i < 1e3; i++) {
 			parsed.validate({

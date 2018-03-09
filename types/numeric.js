@@ -5,23 +5,17 @@ module.exports = function (context) {
 	 * A number (double)
 	 * Example: {name: String, value: Number}
 	 */
-	context.registerObjectType(Number, 'number', null, '$Number', function () {
-		return {
+	context.registerObjectType(Number, 'number', null, '$Number', () => ({
 			type: 'number'
-		}
-	})
+		}))
 
 	/**
 	 * A double value encoded in a string
 	 */
-	context.registerType('numeric', 'string', function (value) {
-		return toNumber(value)
-	}, 'numeric', function () {
-		return {
+	context.registerType('numeric', 'string', value => toNumber(value), 'numeric', () => ({
 			type: 'string',
 			format: 'numeric'
-		}
-	})
+		}))
 
 	/**
 	 * A number range
@@ -33,26 +27,22 @@ module.exports = function (context) {
 	 * 'numeric(,10)'
 	 * 'numeric(1,10)'
 	 */
-	registerTaggedDual('number', 'numeric', function (value, args) {
+	registerTaggedDual('number', 'numeric', (value, args) => {
 		if (args[0] !== undefined && value < args[0]) {
 			throw 'I was expecting a value greater than ' + args[0]
 		} else if (args[1] !== undefined && value > args[1]) {
 			throw 'I was expecting a value less than ' + args[1]
 		}
-	}, function (args) {
-		return buildSchema('number', args[0], args[1])
-	})
+	}, args => buildSchema('number', args[0], args[1]))
 
 	/**
 	 * A safe integer
 	 */
-	registerDual('int', 'numericInt', function (value) {
+	registerDual('int', 'numericInt', value => {
 		if (!isSafeInt(value)) {
 			throw 'I was expecting an integer'
 		}
-	}, function () {
-		return buildSchema('integer')
-	})
+	}, () => buildSchema('integer'))
 
 	/**
 	 * An integer range
@@ -64,7 +54,7 @@ module.exports = function (context) {
 	 * 'numericInt(,10)'
 	 * 'numericInt(1,10)'
 	 */
-	registerTaggedDual('int', 'numericInt', function (value, args) {
+	registerTaggedDual('int', 'numericInt', (value, args) => {
 		if (!isSafeInt(value)) {
 			throw 'I was expecting an integer'
 		}
@@ -74,20 +64,16 @@ module.exports = function (context) {
 		} else if (args[1] !== undefined && value > args[1]) {
 			throw 'I was expecting a value less than ' + args[1]
 		}
-	}, function (args) {
-		return buildSchema('integer', args[0], args[1])
-	})
+	}, args => buildSchema('integer', args[0], args[1]))
 
 	/**
 	 * A safe natural number
 	 */
-	registerDual('uint', 'numericUint', function (value) {
+	registerDual('uint', 'numericUint', value => {
 		if (!isSafeInt(value) || value < 0) {
 			throw 'I was expecting a natural number'
 		}
-	}, function () {
-		return buildSchema('integer', 0)
-	})
+	}, () => buildSchema('integer', 0))
 
 	/**
 	 * An unsigned integer range
@@ -99,7 +85,7 @@ module.exports = function (context) {
 	 * 'numericUint(,10)'
 	 * 'numericUint(1,10)'
 	 */
-	registerTaggedDual('uint', 'numericUint', function (value, args) {
+	registerTaggedDual('uint', 'numericUint', (value, args) => {
 		if (!isSafeInt(value) || value < 0) {
 			throw 'I was expecting a natural number'
 		}
@@ -109,9 +95,7 @@ module.exports = function (context) {
 		} else if (args[1] !== undefined && value > args[1]) {
 			throw 'I was expecting a value less than ' + args[1]
 		}
-	}, function (args) {
-		return buildSchema('integer', Math.max(args[0] || 0, 0), args[1])
-	})
+	}, args => buildSchema('integer', Math.max(args[0] || 0, 0), args[1]))
 
 	/**
 	 * A number from the given set
@@ -121,34 +105,28 @@ module.exports = function (context) {
 		tag: 'numberIn',
 		jsonType: 'number',
 		numeric: true
-	}, function (value, args) {
+	}, (value, args) => {
 		if (args.indexOf(value) === -1) {
 			throw 'I was expecting one of [' + args.join(', ') + ']'
 		}
-	}, returnOriginal, function (args) {
-		return {
+	}, returnOriginal, args => ({
 			type: 'number',
 			enum: args
-		}
-	})
+		}))
 	context.registerTaggedType({
 		tag: 'numericIn',
 		jsonType: 'string',
 		numeric: true
-	}, function (value, args) {
-		var numberValue = toNumber(value)
+	}, (value, args) => {
+		let numberValue = toNumber(value)
 		if (args.indexOf(numberValue) === -1) {
 			throw 'I was expecting one of [' + args.join(', ') + ']'
 		}
 		return numberValue
-	}, returnOriginal, function (args) {
-		return {
+	}, returnOriginal, args => ({
 			type: 'number',
-			enum: args.map(function (arg) {
-				return String(arg)
-			})
-		}
-	})
+			enum: args.map(arg => String(arg))
+		}))
 
 	/**
 	 * Register number and numeric dual basic types
@@ -159,20 +137,16 @@ module.exports = function (context) {
 	 * @private
 	 */
 	function registerDual(numberType, numericType, checkFn, toJSONSchema) {
-		context.registerType(numberType, 'number', checkFn, numberType, function (extra) {
-			return toJSONSchema('number', extra)
-		})
+		context.registerType(numberType, 'number', checkFn, numberType, extra => toJSONSchema('number', extra))
 
-		context.registerType(numericType, 'string', function (value) {
-			var numberValue = toNumber(value)
+		context.registerType(numericType, 'string', value => {
+			let numberValue = toNumber(value)
 			checkFn(numberValue)
 			return numberValue
-		}, numericType, function () {
-			return {
+		}, numericType, () => ({
 				type: 'string',
 				format: numericType
-			}
-		})
+			}))
 	}
 
 	/**
@@ -200,16 +174,14 @@ module.exports = function (context) {
 			maxArgs: 2,
 			sparse: true,
 			numeric: true
-		}, function (value, args) {
-			var numberValue = toNumber(value)
+		}, (value, args) => {
+			let numberValue = toNumber(value)
 			checkFn(numberValue, args)
 			return numberValue
-		}, returnOriginal, function (extra) {
-			return {
+		}, returnOriginal, extra => ({
 				type: 'string',
 				format: extra.original
-			}
-		})
+			}))
 	}
 
 	/**
@@ -237,7 +209,7 @@ function isSafeInt(value) {
  * @throws if invalid
  */
 function toNumber(value) {
-	var numberValue = Number(value),
+	let numberValue = Number(value),
 		type
 	if (isNaN(numberValue)) {
 		type = 'NaN'
@@ -258,8 +230,8 @@ function toNumber(value) {
  * @param {number} [max]
  */
 function buildSchema(type, min, max) {
-	var ret = {
-		type: type
+	let ret = {
+		type
 	}
 
 	if (min !== undefined) {

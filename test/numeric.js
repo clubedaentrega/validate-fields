@@ -1,12 +1,12 @@
-/*globals describe, it*/
+/* globals describe, it*/
 'use strict'
 
 require('should')
 
-var validate = require('../')()
+let validate = require('../')()
 
-describe('numeric types', function () {
-	it('should parse numeric types', function () {
+describe('numeric types', () => {
+	it('should parse numeric types', () => {
 		validate.parse({
 			numeric: 'numeric',
 			numericRange: 'numeric(3.14, 15.92)',
@@ -18,7 +18,7 @@ describe('numeric types', function () {
 		})
 	})
 
-	it('should validate simple numeric, converting string to number', function () {
+	it('should validate simple numeric, converting string to number', () => {
 		test('numeric', '0', true, 0)
 		test('numeric', '3.14000e-3', true, 0.00314)
 		test('numeric', '0x10', true, 16)
@@ -28,7 +28,7 @@ describe('numeric types', function () {
 		test('numeric(3.5, 4.5)', '5', false)
 	})
 
-	it('should validate numeric int, converting string to number', function () {
+	it('should validate numeric int, converting string to number', () => {
 		test('numericInt', '3', true, 3)
 		test('numericInt', '-7', true, -7)
 		test('numericInt', '3.1', false)
@@ -38,7 +38,7 @@ describe('numeric types', function () {
 		test('numericInt(-2, 5)', '3.1', false)
 	})
 
-	it('should validate numeric uint, converting string to number', function () {
+	it('should validate numeric uint, converting string to number', () => {
 		test('numericUint', '3', true, 3)
 		test('numericUint', '7', true, 7)
 		test('numericUint', '-7', false)
@@ -49,7 +49,7 @@ describe('numeric types', function () {
 		test('numericUint(2, 5)', '3.1', false)
 	})
 
-	it('should validate numeric enum, converting string to number', function () {
+	it('should validate numeric enum, converting string to number', () => {
 		test('numericIn(3.14, 15.92)', '3.1400000000', true, 3.14)
 		test('numericIn(3.14, 15.92)', '15.92', true, 15.92)
 		test('numericIn(3.14, 15.92)', '15.93', false)
@@ -63,7 +63,7 @@ describe('numeric types', function () {
  * @param {number} [expectedValue]
  */
 function test(type, value, expected, expectedValue) {
-	var obj = {
+	let obj = {
 		a: value
 	}
 	validate({
