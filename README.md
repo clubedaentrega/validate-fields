@@ -6,13 +6,13 @@
 A simple yet powerful JSON schema validator
 
 ## Install
-`npm install validate-fields --save`
+`npm install validate-fields`
 
 ## Usage
 
 ### Basic
 ```javascript
-var validate = require('validate-fields')(),
+let validate = require('validate-fields')(),
 	schema = {
 		name: String,
 		age: 'uint'
@@ -37,7 +37,7 @@ See the list of valid values for the schema bellow
 ### Pre-parsing
 ```javascript
 // Parse the schema once and store it
-var schema = validate.parse([String]) // an array of non-empty strings
+let schema = validate.parse([String]) // an array of non-empty strings
 
 // Set express route
 // app here is an express instance, used only to ilustrate this example (not part of this module!)
@@ -56,7 +56,7 @@ This way is recommended because if the schema definition is invalid, `validate.p
 ## Escaping HTML
 HTML strings can be escaped by sending one more argument to `validate`:
 ```javascript
-var v = ['html>']
+let v = ['html>']
 validate([String], v)
 v[0] === 'html>'
 
@@ -67,7 +67,7 @@ v[0] === 'html&gt;'
 ```
 Or, using pre-parsing
 ```javascript
-var v = ['html>']
+let v = ['html>']
 validate.parse([String]).validate(v, {
 	escape: true
 })
@@ -94,14 +94,14 @@ Keys that end in `'?'` are optional (`b`, in the example above). All others must
 
 If a value is optional and is empty it will be removed. Example:
 ```javascript
-var obj = {a: '', b: null}
+let obj = {a: '', b: null}
 validate({'a?': String, 'b?': 'int'}, obj) // true
 obj // {}
 ```
 
 Optional fields may declare a default value to use in its place when empty. Example:
 ```js
-var obj = {}
+let obj = {}
 validate({'a=12': Number, 'b=[]': [String], 'c="hi"': String}, obj) // true
 obj // {a: 12, b: [], c: 'hi'}
 ```
@@ -176,7 +176,7 @@ validate.registerType('divBy3', 'number', function (value) {
 	return value/3
 })
 
-var obj = {n: 12}
+let obj = {n: 12}
 validate({n: 'divBy3'}, obj) // true
 obj.n // 4
 ```
@@ -191,7 +191,7 @@ validate.registerTaggedType({
     sparse: false, // default = false. If true, let arguments be skipped: 'tag(1,,2)'
     numeric: true // default = false. If true, parse all arguments as numbers
 }, function (value, args) {
-	var n = args[0]
+	let n = args[0]
 	if (value%n !== 0) {
 		throw 'I was expecting a number divisible by '+n
 	}
@@ -202,24 +202,46 @@ validate('divBy(35)', 35) // true
 ```
 See more examples in the folder `types`. All core types are defined there
 
+Finally, you can extend a type by providing pre and post hooks:
+```javascript
+validate.typedef('time-in', {
+	hour: /^\d\d$/,
+	minute: /^\d\d$/
+}, null, value => {
+	// Convert that object to a string like 'HH:MM'
+	return value.hour + ':' + value.minute
+})
+
+validate.typedef('time-out', {
+	hour: /^\d\d$/,
+	minute: /^\d\d$/
+}, value => ({
+	// Convert 'HH:MM' to an object
+	hour: value.slice(0, 2),
+	minute: value.slice(3, 5)
+}))
+```
+
+Pre-hooks will be executed before the base type checks. Post-hooks will be run afterwards.
+
 ## Interchangeable format
 A parsed `Field` can be serialized to JSON with `JSON.stringify()`:
 ```javascript
-var fields = validate.parse({name: String, age: 'uint', 'birth?': Date})
+let fields = validate.parse({name: String, age: 'uint', 'birth?': Date})
 JSON.stringify(fields) // '{"name":"$String","age":"uint","birth?":"$Date"}'
 ```
 
 Note that custom types can't be serialized, they are replaced by their JSON-type:
 ```javascript
-var fields = validate.parse({myType: 'divBy(7)'}) // defined above
+let fields = validate.parse({myType: 'divBy(7)'}) // defined above
 JSON.stringify(fields) // '{"myType":"$Number"}'
 ```
 
 To get back a `Field` instance, `JSON.parse()` should be used with a reviver and the result then parsed:
 ```javascript
-var serializedFields = '{"name":"$String","age":"uint","birth?":"$Date"}'
-var definition = JSON.parse(serializedFields, validate.reviver) // {name: String, age: 'uint', 'birth?': Date}
-var fields = validate.parse(definition)
+let serializedFields = '{"name":"$String","age":"uint","birth?":"$Date"}'
+let definition = JSON.parse(serializedFields, validate.reviver) // {name: String, age: 'uint', 'birth?': Date}
+let fields = validate.parse(definition)
 
 fields.validate({name: 'John', age: 12}) // true
 ```
@@ -227,7 +249,7 @@ fields.validate({name: 'John', age: 12}) // true
 ## JSON Schema
 A parsed `Field` can be exported as [JSON Schema](http://json-schema.org/):
 ```javascript
-var fields = validate.parse({name: String, age: 'uint', 'birth?': Date})
+let fields = validate.parse({name: String, age: 'uint', 'birth?': Date})
 fields.toJSONSchema()
 /* {
 	type: 'object',

@@ -1,3 +1,10 @@
+# 4.0.0
+## Breaking changes
+* Drop support for node 0.12 and 4
+
+## Other changes
+* Added: pre and post hooks to `typedef()`
+
 # 3.7.1
 * Changed: do not depend on Buffer to check base64 string
 

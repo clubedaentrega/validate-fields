@@ -118,8 +118,8 @@ describe('readme examples', () => {
 		JSON.stringify(fields).should.be.equal('{"name":"$String","age":"uint","birth?":"$Date"}')
 
 		let fields2 = validate.parse({
-				myType: 'divBy(7)'
-			}) // defined above
+			myType: 'divBy(7)'
+		}) // defined above
 		JSON.stringify(fields2).should.be.equal('{"myType":"$Number"}')
 
 		let serializedFields = '{"name":"$String","age":"uint","birth?":"$Date"}'
@@ -135,5 +135,42 @@ describe('readme examples', () => {
 			name: 'John',
 			age: 12
 		}).should.be.true()
+	})
+
+	it('should work for extended types example', () => {
+		validate.typedef('time-in', {
+			hour: /^\d\d$/,
+			minute: /^\d\d$/
+		}, null, value => (
+			// Convert that object to a string like 'HH:MM'
+			value.hour + ':' + value.minute
+		))
+		validate.typedef('time-out', {
+			hour: /^\d\d$/,
+			minute: /^\d\d$/
+		}, value => ({
+			// Convert 'HH:MM' to an object
+			hour: value.slice(0, 2),
+			minute: value.slice(3, 5)
+		}))
+
+		let obj = {
+			timeIn: {
+				hour: '12',
+				minute: '34'
+			},
+			timeOut: '56:78'
+		}
+		validate({
+			timeIn: 'time-in',
+			timeOut: 'time-out'
+		}, obj)
+		obj.should.be.eql({
+			timeIn: '12:34',
+			timeOut: {
+				hour: '56',
+				minute: '78'
+			}
+		})
 	})
 })

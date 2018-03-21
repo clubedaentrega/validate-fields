@@ -86,9 +86,11 @@ module.exports = function () {
 	 * Define a new simple type based on existing types
 	 * @param {string} name
 	 * @param {*} definition
+	 * @param {?checkCallback} preHook
+	 * @param {?checkCallback} postHook
 	 * @throws if definition could not be understood or this type already exists
 	 */
-	context.typedef = function (name, definition) {
+	context.typedef = function (name, definition, preHook = null, postHook = null) {
 		if (typeof name !== 'string') {
 			throw new Error('Invalid argument type for name, it must be a string')
 		}
@@ -97,6 +99,8 @@ module.exports = function () {
 			throw new Error('Type ' + name + ' already registered')
 		}
 		definition.typedefName = name
+		definition.preHook = preHook
+		definition.postHook = postHook
 		typedefs[name] = definition
 	}
 
@@ -205,9 +209,9 @@ module.exports = function () {
 	 * @param {Object} definition
 	 * @param {string} definition.tag
 	 * @param {string} definition.jsonType One of 'number', 'string', 'boolean', 'object' or 'array'
-	 * @parma {number} [definition.minArgs=0]
-	 * @parma {number} [definition.maxArgs=0] Zero means no limit
-	 * @parma {boolean} [definition.sparse=false] true let some args to be skipped: 'tag(,2,,4)'
+	 * @param {number} [definition.minArgs=0]
+	 * @param {number} [definition.maxArgs=0] Zero means no limit
+	 * @param {boolean} [definition.sparse=false] true let some args to be skipped: 'tag(,2,,4)'
 	 * @param {boolean} [definition.numeric=false] true will parse all args as numbers
 	 * @param {?parseTaggedArgsCallback} [definition.parseArgs=null] process arguments
 	 * @param {checkCallback} [checkFn=function(){}]

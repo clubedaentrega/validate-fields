@@ -17,6 +17,12 @@ function Field(type, extra) {
 
 	/** @member {?string} */
 	this.typedefName = null
+
+	/** @member {?checkCallback} */
+	this.preHook = null
+
+	/** @member {?checkCallback} */
+	this.postHook = null
 }
 
 module.exports = Field
@@ -40,7 +46,7 @@ Field.prototype.validate = function (value, options) {
 			this.lastErrorPath = e.path
 			return false
 		}
-			throw e
+		throw e
 
 	}
 	this.lastError = ''
@@ -57,7 +63,16 @@ Field.prototype.validate = function (value, options) {
  */
 Field.prototype._validate = function (value, path, options) {
 	try {
-		return this.type.validate(value, path, this.extra, options)
+		if (this.preHook) {
+			let pre = this.preHook(value, this.extra, options, path)
+			value = pre === undefined ? value : pre
+		}
+		value = this.type.validate(value, path, this.extra, options)
+		if (this.postHook) {
+			let post = this.postHook(value, this.extra, options, path)
+			value = post === undefined ? value : post
+		}
+		return value
 	} catch (e) {
 		if (typeof e === 'string') {
 			// Convert from string to error
