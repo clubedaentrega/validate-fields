@@ -54,16 +54,38 @@ Field.prototype.validate = function (value, options) {
 }
 
 /**
- * Check if the value is valid
+ * Apply prehook
  * @param {*} the original value (NOTE: this can be modified, make a copy if you need the original back)
  * @param {string} path
  * @param {Object} options
  * @returns {*} the parsed value
  * @throws {ValidationError}
  */
-Field.prototype._validate = function (value, path, options) {
+Field.prototype._applyPreHook = function (value, path, options) {
 	try {
-		if (this.preHook) {
+		let pre = this.preHook(value, this.extra, options, path)
+		return pre === undefined ? value : pre
+	} catch (e) {
+		if (typeof e === 'string') {
+			// Convert from string to error
+			throw new ValidationError(e, path)
+		}
+		throw e
+	}
+}
+
+/**
+ * Check if the value is valid
+ * @param {*} the original value (NOTE: this can be modified, make a copy if you need the original back)
+ * @param {string} path
+ * @param {Object} options
+ * @param {boolean} [skipPreHook=false]
+ * @returns {*} the parsed value
+ * @throws {ValidationError}
+ */
+Field.prototype._validate = function (value, path, options, skipPreHook = false) {
+	try {
+		if (!skipPreHook && this.preHook) {
 			let pre = this.preHook(value, this.extra, options, path)
 			value = pre === undefined ? value : pre
 		}

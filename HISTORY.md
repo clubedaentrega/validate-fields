@@ -1,3 +1,6 @@
+# 4.1.0
+* Fix: apply pre hook before checking for emptiness
+
 # 4.0.0
 ## Breaking changes
 * Drop support for node 0.12 and 4

@@ -56,4 +56,34 @@ describe('typedef', () => {
 			return arr[0]
 		}
 	})
+
+	it('should run pre-hooks before testing for emptiness', () => {
+		validate.typedef('double-or-nothing', {
+			a: Number
+		}, value => {
+			if (value === 0) {
+				return null
+			}
+			return {
+				a: 2 * value
+			}
+		})
+
+		should(check(17)).be.eql({
+			x: {
+				a: 34
+			}
+		})
+		should(check(0)).be.eql({})
+
+		function check(value) {
+			let obj = {
+				x: value
+			}
+			validate({
+				'x?': 'double-or-nothing'
+			}, obj).should.be.equal(true)
+			return obj
+		}
+	})
 })

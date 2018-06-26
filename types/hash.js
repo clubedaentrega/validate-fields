@@ -57,17 +57,28 @@ module.exports = function (context) {
 			subpath = path ? path + '.' + key : key
 			if (!(key in value)) {
 				throw new ValidationError('I was expecting a value', subpath)
-			} else if (field.type.isEmpty(value[key])) {
+			}
+			let isEmpty = field.type.isEmpty(value[key])
+			if (!isEmpty && field.preHook) {
+				value[key] = field._applyPreHook(value[key])
+				isEmpty = field.type.isEmpty(value[key])
+			}
+			if (isEmpty) {
 				throw new ValidationError('I was expecting a non-empty value', subpath)
 			}
-			value[key] = field._validate(value[key], subpath, options)
+			value[key] = field._validate(value[key], subpath, options, true)
 		}
 
 		// Check optional fields
 		for (key in extra.optional) {
 			info = extra.optional[key]
 			subpath = path ? path + '.' + key : key
-			if (info.field.type.isEmpty(value[key])) {
+			let isEmpty = info.field.type.isEmpty(value[key])
+			if (!isEmpty && info.field.preHook) {
+				value[key] = info.field._applyPreHook(value[key])
+				isEmpty = info.field.type.isEmpty(value[key])
+			}
+			if (isEmpty) {
 				if (info.defaultSource === undefined) {
 					// No default: remove the key
 					delete value[key]
@@ -77,7 +88,7 @@ module.exports = function (context) {
 					value[key] = info.field._validate(JSON.parse(info.defaultSource), subpath, options)
 				}
 			} else {
-				value[key] = info.field._validate(value[key], subpath, options)
+				value[key] = info.field._validate(value[key], subpath, options, true)
 			}
 		}
 
