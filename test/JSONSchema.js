@@ -194,10 +194,6 @@ describe('JSONSchema', () => {
 		})
 
 		validate.parse('user').toJSONSchema().should.be.eql({
-			$ref: '#/definitions/user'
-		})
-
-		validate.parse('user').toJSONSchema(true).should.be.eql({
 			type: 'object',
 			properties: {
 				name: {
@@ -205,6 +201,50 @@ describe('JSONSchema', () => {
 				}
 			},
 			required: ['name']
+		})
+
+		validate.parse({
+			user: 'user'
+		}).toJSONSchema().should.be.eql({
+			type: 'object',
+			properties: {
+				user: {
+					type: 'object',
+					properties: {
+						name: {
+							type: 'string'
+						}
+					},
+					required: ['name']
+				}
+			},
+			required: ['user']
+		})
+
+		validate.parse('user').toJSONSchema('#/some/path').should.be.eql({
+			type: 'object',
+			properties: {
+				name: {
+					type: 'string'
+				}
+			},
+			required: ['name']
+		})
+
+		validate.parse('user').toJSONSchema('#/some/path', true).should.be.eql({
+			$ref: '#/some/path/user'
+		})
+
+		validate.parse({
+			user: 'user'
+		}).toJSONSchema('#/some/path').should.be.eql({
+			type: 'object',
+			properties: {
+				user: {
+					$ref: '#/some/path/user'
+				}
+			},
+			required: ['user']
 		})
 	})
 

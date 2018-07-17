@@ -108,15 +108,15 @@ Type.prototype.convertToJSON = function (extra) {
 
 /**
  * Function called when coverting to JSON Schema
- * Only core types can be precisely defined
+ * Only core types can be precisely represented
  * Custom types are represented by their parent JSON-type
  * @param {*} extra
- * @param {boolean} expandTypedefs
+ * @param {string} [componentsPath] - if given, internal typedefs are returned as references
  * @returns {Object}
  */
-Type.prototype.convertToJSONSchema = function (extra, expandTypedefs) {
+Type.prototype.convertToJSONSchema = function (extra, componentsPath) {
 	if (this._toJSONSchema) {
-		return this._toJSONSchema(extra, expandTypedefs)
+		return this._toJSONSchema(extra, componentsPath)
 	}
 
 	// Aproximated convertion

@@ -122,7 +122,7 @@ module.exports = function (context) {
 		}
 
 		return ret
-	}, (extra, expandTypedefs) => {
+	}, (extra, componentsPath) => {
 		let ret = {
 				type: 'object',
 				properties: {},
@@ -131,12 +131,12 @@ module.exports = function (context) {
 			key, info
 
 		for (key in extra.required) {
-			ret.properties[key] = extra.required[key].toJSONSchema(expandTypedefs)
+			ret.properties[key] = extra.required[key].toJSONSchema(componentsPath, true)
 			ret.required.push(key)
 		}
 		for (key in extra.optional) {
 			info = extra.optional[key]
-			ret.properties[key] = info.field.toJSONSchema(expandTypedefs)
+			ret.properties[key] = info.field.toJSONSchema(componentsPath, true)
 			if (info.defaultSource !== undefined) {
 				ret.properties[key].default = JSON.parse(info.defaultSource)
 			}

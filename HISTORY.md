@@ -1,3 +1,9 @@
+# 5.0.0
+## Breaking changes
+* `Field#toJSONSchema()` when converting a type defined with typedef now behaves differently.
+Now it returns the full description when called with no paramenters.
+To use references, pass the base path as the first parameter, example: `Field#toJSONSchema('#/definitions')`
+
 # 4.1.0
 * Fix: apply pre hook before checking for emptiness
 

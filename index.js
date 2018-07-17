@@ -136,7 +136,7 @@ module.exports = function () {
 	/**
 	 * @callback toJSONSchemaCallback
 	 * @param {*} extra
-	 * @param {boolean} expandTypedefs
+	 * @param {string} componentsPath
 	 * @returns {Object}
 	 */
 

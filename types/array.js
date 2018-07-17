@@ -20,8 +20,8 @@ module.exports = function (context) {
 			value[i] = extra._validate(value[i], subpath, options)
 		}
 		return value
-	}, extra => [extra.toJSON()], (extra, expandTypedefs) => ({
-			type: 'array',
-			items: extra.toJSONSchema(expandTypedefs)
-		}))
+	}, extra => [extra.toJSON()], (extra, componentsPath) => ({
+		type: 'array',
+		items: extra.toJSONSchema(componentsPath, true)
+	}))
 }

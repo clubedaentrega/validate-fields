@@ -116,16 +116,17 @@ Field.prototype.toJSON = function () {
 
 /**
  * Function called when coverting to JSON Schema
- * Only core types can be precisely stringified
+ * Only core types can be precisely represented
  * Custom types are represented by their parent JSON-type
- * @param {boolean} [expandTypedefs=false] - if false, typedefs are returned as references
+ * @param {string} [componentsPath] - if given, internal typedefs are returned as references
+ * @param {boolean} [forceRef] - if true, return a $ref at the first level when possible
  * @returns {Object}
  */
-Field.prototype.toJSONSchema = function (expandTypedefs) {
-	if (this.typedefName && !expandTypedefs) {
+Field.prototype.toJSONSchema = function (componentsPath, forceRef) {
+	if (forceRef && this.typedefName && componentsPath) {
 		return {
-			$ref: '#/definitions/' + this.typedefName
+			$ref: componentsPath + '/' + this.typedefName
 		}
 	}
-	return this.type.convertToJSONSchema(this.extra, Boolean(expandTypedefs))
+	return this.type.convertToJSONSchema(this.extra, componentsPath)
 }
