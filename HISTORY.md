@@ -1,3 +1,6 @@
+# 5.1.0
+* Added: option `partial` to allow for partial validation
+
 # 5.0.0
 ## Breaking changes
 * `Field#toJSONSchema()` when converting a type defined with typedef now behaves differently.

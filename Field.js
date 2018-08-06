@@ -37,6 +37,38 @@ let ValidationError = require('./ValidationError')
  */
 Field.prototype.validate = function (value, options) {
 	options = options || {}
+
+	// Span-out partial fields
+	// Use `false` to mark leaf fields. This is a hack to make `if (tree[part])` check for a non-leaf field
+	// ['a.b.c'] -> {a: {b: {c: false}}}
+	// ['a', 'b.c'] -> {a: false, b: {c: false}}
+	// ['a', 'a.b'] -> {a: {b: false}}
+	// ['a.b', 'a'] -> {a: {b: false}}
+	if (options.partial) {
+		options._partialTree = Object.create(null)
+
+		for (let each of options.partial) {
+			let parts = each.split('.'),
+				tree = options._partialTree,
+				len = parts.length
+
+			for (let i = 0; i < len - 1; i++) {
+				let part = parts[i]
+				if (!tree[part]) {
+					// Add sub-tree if there wasn't any or `false` denoting a leaf field
+					tree[part] = Object.create(null)
+				}
+				tree = tree[part]
+			}
+
+			let lastPart = parts[len - 1]
+			if (!lastPart[lastPart]) {
+				// Only mark the leaf field if it doesn't overwrite a previous non-leaf field
+				tree[lastPart] = false
+			}
+		}
+	}
+
 	try {
 		this._validate(value, '', options)
 	} catch (e) {

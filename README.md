@@ -269,3 +269,67 @@ fields.toJSONSchema()
 	required: ['name', 'age']
 } */
 ```
+
+## Partial validation
+A schema can be used for validating only a subset of fields, for example:
+
+```javascript
+let schema = validate.parse({label: String, creation: Date})
+schema.validate({label: 'earth'}) // false
+schema.validate({label: 'earth'}, {partial: ['label']}) // true
+```
+
+This is useful when fields in the value can be dynamically selected, like in an endpoint when the caller only cares about two or three fields from a normally bigger schema.
+
+Multiple paths should be passed as elements of the `options.partial` array. Paths can also recurse into inner properties:
+
+```javascript
+validate({
+	post: {title: String, creation: Date},
+	user: {name: String, age: 'uint'}
+}, {
+	post: {title: 'Top 10 ways to create top listings'},
+	user: {age: 30}
+}, {
+	partial: ['post.title', 'user.age']
+}) // true
+```
+
+In arrays, partial paths enumerate over its elements:
+
+```javascript
+validate({
+	table: {
+		rows: [{
+			cells: [{value: Number, text: String}]
+		}]
+	}
+}, {
+	table: {
+		rows: [{
+			cells: [{value: 3}, {value: 13}]
+		}, {
+			cells: [{value: 14}, {value: '15'}]
+		}]
+	}
+}, {
+	partial: ['table.rows.cells.value']
+}) // false
+validate.lastError // I was expecting number and you gave me string in table.rows.1.cells.1.value
+```
+
+Custom values should implement partial validation accordingly, using the value received over `options._partialTree`. Example:
+
+```javascript
+validate.registerType('custom-with-partial', 'object', (value, extra, options) => {
+	options._partialTree // {c: {d: false}}
+})
+validate(
+	{a: {b: 'custom-with-partial'}},
+	{a: {b: 'some data'},
+	{partial: ['a.b.c.d']}
+)
+```
+
+In strict mode, any field in the value not listed in the partial will result in an error.
+Likewise, any field in the partial not in the schema will result in an error.

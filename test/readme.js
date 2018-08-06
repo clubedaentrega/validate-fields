@@ -173,4 +173,84 @@ describe('readme examples', () => {
 			}
 		})
 	})
+
+	it('should work for partial validation examples', () => {
+		let schema = validate.parse({
+			label: String,
+			creation: Date
+		})
+		schema.validate({
+			label: 'earth'
+		}).should.be.false()
+		schema.validate({
+			label: 'earth'
+		}, {
+			partial: ['label']
+		}).should.be.true()
+
+		validate({
+			post: {
+				title: String,
+				creation: Date
+			},
+			user: {
+				name: String,
+				age: 'uint'
+			}
+		}, {
+			post: {
+				title: 'Top 10 ways to create top listings'
+			},
+			user: {
+				age: 30
+			}
+		}, {
+			partial: ['post.title', 'user.age']
+		}).should.be.true()
+
+		validate({
+			table: {
+				rows: [{
+					cells: [{
+						value: Number,
+						text: String
+					}]
+				}]
+			}
+		}, {
+			table: {
+				rows: [{
+					cells: [{
+						value: 3
+					}, {
+						value: 13
+					}]
+				}, {
+					cells: [{
+						value: 14
+					}, {
+						value: '15'
+					}]
+				}]
+			}
+		}, {
+			partial: ['table.rows.cells.value']
+		}).should.be.false()
+		validate.lastError.should.be.eql('I was expecting number and you gave me string in table.rows.1.cells.1.value')
+
+		validate.registerType('custom-with-partial', 'object', (value, extra, options) => {
+			options._partialTree.c.d.should.be.false()
+		})
+		validate({
+			a: {
+				b: 'custom-with-partial'
+			}
+		}, {
+			a: {
+				b: {}
+			}
+		}, {
+			partial: ['a.b.c.d']
+		})
+	})
 })

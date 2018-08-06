@@ -49,14 +49,25 @@ module.exports = function (context) {
 
 		return extra
 	}, 'object', (value, extra, options, path) => {
-		let key, field, subpath, info
+		let partialTree = options._partialTree,
+			key, field, subPath, info
 
 		// Check required fields
 		for (key in extra.required) {
+			let subPartialTree
+			if (partialTree) {
+				subPartialTree = partialTree[key]
+				if (subPartialTree === undefined) {
+					// Don't check this field
+					continue
+				}
+				options._partialTree = subPartialTree
+			}
+
 			field = extra.required[key]
-			subpath = path ? path + '.' + key : key
+			subPath = path ? path + '.' + key : key
 			if (!(key in value)) {
-				throw new ValidationError('I was expecting a value', subpath)
+				throw new ValidationError('I was expecting a value', subPath)
 			}
 			let isEmpty = field.type.isEmpty(value[key])
 			if (!isEmpty && field.preHook) {
@@ -64,15 +75,25 @@ module.exports = function (context) {
 				isEmpty = field.type.isEmpty(value[key])
 			}
 			if (isEmpty) {
-				throw new ValidationError('I was expecting a non-empty value', subpath)
+				throw new ValidationError('I was expecting a non-empty value', subPath)
 			}
-			value[key] = field._validate(value[key], subpath, options, true)
+			value[key] = field._validate(value[key], subPath, options, true)
 		}
 
 		// Check optional fields
 		for (key in extra.optional) {
+			let subPartialTree
+			if (partialTree) {
+				subPartialTree = partialTree[key]
+				if (subPartialTree === undefined) {
+					// Don't check this field
+					continue
+				}
+				options._partialTree = subPartialTree
+			}
+
 			info = extra.optional[key]
-			subpath = path ? path + '.' + key : key
+			subPath = path ? path + '.' + key : key
 			let isEmpty = info.field.type.isEmpty(value[key])
 			if (!isEmpty && info.field.preHook) {
 				value[key] = info.field._applyPreHook(value[key])
@@ -85,25 +106,38 @@ module.exports = function (context) {
 				} else {
 					// Set to default
 					// JSON.parse won't throw because the source has already been checked
-					value[key] = info.field._validate(JSON.parse(info.defaultSource), subpath, options)
+					value[key] = info.field._validate(JSON.parse(info.defaultSource), subPath, options)
 				}
 			} else {
-				value[key] = info.field._validate(value[key], subpath, options, true)
+				value[key] = info.field._validate(value[key], subPath, options, true)
 			}
 		}
 
 		if (options.strict) {
 			// Check for extraneous fields
 			for (key in value) {
-				subpath = path ? path + '.' + key : key
+				subPath = path ? path + '.' + key : key
 				if (value[key] === undefined) {
 					delete value[key]
 				} else if (!(key in extra.required) && !(key in extra.optional)) {
-					throw new ValidationError('I wasn\'t expecting a value', subpath)
+					throw new ValidationError('I wasn\'t expecting a value', subPath)
+				}
+			}
+
+			if (partialTree) {
+				// Check for extraneous fields
+				for (key in partialTree) {
+					subPath = path ? path + '.' + key : key
+					if (!(key in extra.required) && !(key in extra.optional)) {
+						throw new ValidationError('I wasn\'t expecting an unknown partial field', subPath)
+					}
 				}
 			}
 		}
 
+		if (partialTree) {
+			options._partialTree = partialTree
+		}
 		return value
 	}, extra => {
 		let ret = Object.create(null),
