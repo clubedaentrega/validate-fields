@@ -1,3 +1,6 @@
+# 5.1.1
+* Fixed: `strict` option was not totally respected when using `partial`
+
 # 5.1.0
 * Added: option `partial` to allow for partial validation
 

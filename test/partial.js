@@ -118,6 +118,17 @@ describe('partial', () => {
 			partial: ['a'],
 			error: 'I wasn\'t expecting a value in c'
 		}], true)
+
+		check({
+			a: Number,
+			b: Number
+		}, {
+			a: 17,
+			b: 17 // <-- extra
+		}, [{
+			partial: ['a'],
+			error: 'I wasn\'t expecting a value in b'
+		}], true)
 	})
 
 	it('should not allow extra field in partial in strict mode', () => {

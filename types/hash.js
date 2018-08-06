@@ -121,6 +121,8 @@ module.exports = function (context) {
 					delete value[key]
 				} else if (!(key in extra.required) && !(key in extra.optional)) {
 					throw new ValidationError('I wasn\'t expecting a value', subPath)
+				} else if (partialTree && partialTree[key] === undefined) {
+					throw new ValidationError('I wasn\'t expecting a value', subPath)
 				}
 			}
 

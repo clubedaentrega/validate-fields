@@ -159,7 +159,7 @@ validate(['zip-code'], ['12345', '12345-1234']) // true
 ```
 Typedef works as a simple alias (like in C)
 
-Each type you call `require('validate-fields')()` a new context is created. Each context is isolated from each other. Types defined in one context do not conflict with other contexts.
+Every time you call `require('validate-fields')()` a new context is created. Each context is isolated from each other. Types defined in one context do not conflict with other contexts.
 
 If you need more power, you can create the type from scratch and define every detail about the validation.
 
